@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="Mac 10.14  编译Android 8.1源码及刷入nexus 6p">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>Mac 10.14  编译Android 8.1源码及刷入nexus 6p - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="/https">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            Mac 10.14  编译Android 8.1源码及刷入nexus 6p
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-01
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/源码/" rel="tag">
+                  源码
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><p><a href="https://source.android.com/setup/build/initializing" target="_blank" rel="noopener">官网</a> 描述得已经相当清楚了 ，这里稍微总结一下： </p>
+<h3 id="创建区分大小写的磁盘映像"><a href="#创建区分大小写的磁盘映像" class="headerlink" title="创建区分大小写的磁盘映像"></a>创建区分大小写的磁盘映像</h3><p>mac系统默认是不区分大小写的，所以我们需要创建一个区分大小写的文件系统 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 60g ~/android.dmg</span><br></pre></td></tr></table></figure>
+<p>这将创建一个.dmg.sparseimage文件，该文件在装载后可用作具有 Android 开发所需格式的驱动盘。 </p>
+<blockquote>
+<p>  按官网所说完成编译至少需要 25GB 空间，相信我，其实至少需要60G。当然，空间大小后面还可以通过以下命令修改 </p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span>   hdiutil resize -size &lt;new-size-you-want&gt;g ~/android.dmg.sparseimage</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>为了方便，我们还可以往环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)添加辅助函数</p>
+<ul>
+<li><p>装载函数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> mount the android file image</span><br><span class="line">mountAndroid() &#123; hdiutil attach ~/android.dmg.sparseimage -mountpoint /Volumes/android;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>卸载函数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> unmount the android file image</span><br><span class="line">umountAndroid() &#123; hdiutil detach /Volumes/android; &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="安装所需的软件"><a href="#安装所需的软件" class="headerlink" title="安装所需的软件"></a>安装所需的软件</h3><ul>
+<li><p>JDK</p>
+<p>各种 Android 版本使用的 Java 版本不一样，请参阅相关<a href="https://source.android.com/setup/build/requirements.html#latest-version" target="_blank" rel="noopener">要求</a></p>
+<p>我这里是编译Android8.1.0 ，所以使用java1.8</p>
+</li>
+<li><p>Xcode 命令行工具</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>MacPorts</p>
+<p>从<a href="http://www.macports.org/install.php" target="_blank" rel="noopener">macports.org</a> 下载安装,请确保 <code>/opt/local/bin</code> 在路径中显示在 <code>/usr/bin</code> <strong>前面</strong>。否则，请将以下内容添加到环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/opt/local/bin:$PATH</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>通过 MacPorts 获取 Make、Git 、 GPG、BISON 软件包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg bison</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+</ul>
+<h4 id="设置文件描述符数量上限"><a href="#设置文件描述符数量上限" class="headerlink" title="设置文件描述符数量上限"></a>设置文件描述符数量上限</h4><p>在 Mac OS 中，可同时打开的文件描述符的默认数量上限太低，在高度并行的编译流程中，可能会超出此上限。要提高此上限，请将下列行添加到环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> set the number of open files to be 1024</span><br><span class="line">ulimit -S -n 1024</span><br></pre></td></tr></table></figure>
+<h2 id="下载源代码"><a href="#下载源代码" class="headerlink" title="下载源代码"></a>下载源代码</h2><p>Android 源代码树位于由 Google 托管的 Git 代码库中。为了在 Android 环境中更轻松地使用 Git，Google开发了<a href="https://source.android.com/setup/develop/repo.html" target="_blank" rel="noopener">Repo</a>。</p>
+<h3 id="安装-Repo"><a href="#安装-Repo" class="headerlink" title="安装 Repo"></a>安装 Repo</h3><ol>
+<li><p>确保主目录下有一个 <code>bin/</code> 目录，并且该目录包含在路径中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/bin</span><br><span class="line">PATH=~/bin:$PATH</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下载 Repo 工具，并确保它可执行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo</span><br><span class="line">chmod a+x ~/bin/repo</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="repo-初始化"><a href="#repo-初始化" class="headerlink" title="repo 初始化"></a>repo 初始化</h3><h4 id="进入我们一开始创建的文件系统-创建一个空目录"><a href="#进入我们一开始创建的文件系统-创建一个空目录" class="headerlink" title="进入我们一开始创建的文件系统,创建一个空目录"></a>进入我们一开始创建的文件系统,创建一个空目录</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ mountAndroid</span><br><span class="line">/dev/disk3          	GUID_partition_scheme</span><br><span class="line">/dev/disk3s1        	EFI</span><br><span class="line">/dev/disk3s2        	Apple_HFS                      	/Volumes/android</span><br><span class="line">➜  ~ cd /Volumes/android</span><br><span class="line">➜  ~ mkdir aosp</span><br><span class="line">➜  ~ cd aosp</span><br></pre></td></tr></table></figure>
+<h4 id="指定需要checkout对应的源代码标记和编译版本"><a href="#指定需要checkout对应的源代码标记和编译版本" class="headerlink" title="指定需要checkout对应的源代码标记和编译版本"></a>指定需要checkout对应的<a href="https://source.android.com/setup/start/build-numbers.html#source-code-tags-and-builds" target="_blank" rel="noopener">源代码标记和编译版本</a></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo init -u https://android.googlesource.com/platform/manifest -b android-8.1.0_r50</span><br></pre></td></tr></table></figure>
+<p>初始化成功后，目录中应包含一个 <code>.repo</code> 目录。</p>
+<h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><p>这时候就可以开始漫长的下载过程了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo sync</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>同步操作顺利的话将需要 1 个小时或更长时间完成,</p>
+</blockquote>
+<h3 id="下载驱动"><a href="#下载驱动" class="headerlink" title="下载驱动"></a>下载驱动</h3><p>从<a href="https://developers.google.com/android/drivers" target="_blank" rel="noopener">官网</a>下载对应机型驱动即可，下载完成后解压，依次执行里面的sh文件，如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ./extract-huawei-angler.sh</span><br><span class="line"></span><br><span class="line">The license for this software will now be displayed.</span><br><span class="line">You must agree to this license before using this software.</span><br><span class="line"></span><br><span class="line">Press Enter to view the licensels</span><br></pre></td></tr></table></figure>
+<p>执行完毕，驱动文件会释放到vendor目录。</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><h3 id="清理"><a href="#清理" class="headerlink" title="清理"></a>清理</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make clobber</span><br></pre></td></tr></table></figure>
+<h3 id="设置环境"><a href="#设置环境" class="headerlink" title="设置环境"></a>设置环境</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source build/envsetup.sh</span><br></pre></td></tr></table></figure>
+<h3 id="选择目标"><a href="#选择目标" class="headerlink" title="选择目标"></a>选择目标</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ lunch</span><br><span class="line"></span><br><span class="line">You're building on Darwin</span><br><span class="line"></span><br><span class="line">Lunch menu... pick a combo:</span><br><span class="line">     1. aosp_arm-eng</span><br><span class="line">     2. aosp_arm64-eng</span><br><span class="line">     3. aosp_mips-eng</span><br><span class="line">     4. aosp_mips64-eng</span><br><span class="line">     5. aosp_x86-eng</span><br><span class="line">     6. aosp_x86_64-eng</span><br><span class="line">     7. aosp_deb-userdebug</span><br><span class="line">     8. aosp_flo-userdebug</span><br><span class="line">     9. full_fugu-userdebug</span><br><span class="line">     10. aosp_fugu-userdebug</span><br><span class="line">     11. mini_emulator_arm64-userdebug</span><br><span class="line">     12. m_e_arm-userdebug</span><br><span class="line">     13. mini_emulator_mips-userdebug</span><br><span class="line">     14. mini_emulator_x86-userdebug</span><br><span class="line">     15. mini_emulator_x86_64-userdebug</span><br><span class="line">     16. aosp_flounder-userdebug</span><br><span class="line">     17. aosp_angler-userdebug</span><br><span class="line">     18. aosp_bullhead-userdebug</span><br><span class="line">     19. aosp_hammerhead-userdebug</span><br><span class="line">     20. aosp_hammerhead_fp-userdebug</span><br><span class="line">     21. aosp_shamu-userdebug</span><br><span class="line">     22. aosp_bullhead-userdebug</span><br><span class="line">     23. aosp_angler-userdebug</span><br></pre></td></tr></table></figure>
+<p>因为我要编译nexus6p，这里选择23，其他设备可以参考<a href="https://source.android.com/source/running.html#selecting-device-build" target="_blank" rel="noopener">选择设备编译系统</a></p>
+<h3 id="编译代码"><a href="#编译代码" class="headerlink" title="编译代码"></a>编译代码</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j8</span><br></pre></td></tr></table></figure>
+<p><code>-jN</code> 表示编译并行任务数，这个示电脑情况而定，一般取cpu数的1～2倍就可以</p>
+<h3 id="编译遇到问题"><a href="#编译遇到问题" class="headerlink" title="编译遇到问题"></a>编译遇到问题</h3><h4 id="找不到对应的macOS-sdk"><a href="#找不到对应的macOS-sdk" class="headerlink" title="找不到对应的macOS.sdk"></a>找不到对应的macOS.sdk</h4><ul>
+<li><p>报错日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[44/44] bootstrap out/soong/.minibootstrap/build.ninja.in </span><br><span class="line">[4/4] out/soong/.bootstrap/bin/minibp out/soong/.bootstrap/build.ninja </span><br><span class="line">[860/861] glob vendor///Android.bp </span><br><span class="line">[54/54] out/soong/.bootstrap/bin/soong_build out/soong/build.ninja </span><br><span class="line">FAILED: out/soong/build.ninja </span><br><span class="line">out/soong/.bootstrap/bin/soong_build -t -b out/soong -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp </span><br><span class="line">internal error: Could not find a supported mac sdk: ["10.10" "10.11" "10.12"] </span><br><span class="line">ninja: build stopped: subcommand failed. </span><br><span class="line">17:53:06 soong failed with: exit status 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解决方法</p>
+<p>修改/build/soong/cc/config/x86_darwin_host.go文件，添加10.14支持，如下</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">darwinSupportedSdkVersions = []<span class="built_in">string</span>&#123;</span><br><span class="line">    <span class="string">"10.10"</span>,</span><br><span class="line">    <span class="string">"10.11"</span>,</span><br><span class="line">    <span class="string">"10.12"</span>,</span><br><span class="line">    <span class="string">"10.14"</span>, <span class="comment">// 添加mac sdk 10.14</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="遇到bison-错误"><a href="#遇到bison-错误" class="headerlink" title="遇到bison 错误"></a>遇到bison 错误</h4><ul>
+<li><p>报错日志</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FAILED: out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h </span><br><span class="line">BISON_PKGDATADIR=external/bison/data prebuilts/misc/darwin-x86/bison/bison -d --defines=out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h -o out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c external/selinux/checkpolicy/policy_parse.y </span><br><span class="line">[ 0% 309/87784] //external/libcxx:libc++_static header-abi-dumper src/random.cpp [arm] </span><br><span class="line">ninja: build stopped: subcommand failed. </span><br><span class="line">18:05:05 ninja failed with: exit status 1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>解决办法</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd /Volumes/AOSP/external/bison</span><br><span class="line">git cherry-pick c0c852bd6fe462b148475476d9124fd740eba160</span><br><span class="line">mm </span><br><span class="line"><span class="meta">#</span> 用新生成的bison替换掉原bison文件</span><br><span class="line">cp /Volumes/AOSP/out/host/darwin-x86/bin/bison /Volumes/AOSP/prebuilts/misc/darwin-x86/bison/ </span><br><span class="line"><span class="meta">#</span> 重新编译</span><br><span class="line">make -j8</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="刷机"><a href="#刷机" class="headerlink" title="刷机"></a>刷机</h2><p>经过漫长的等待和反复折腾后，终于到了最后一步—刷机。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 手机连接电脑情况下</span><br><span class="line">adb reboot bootloader </span><br><span class="line"><span class="meta">#</span> 进入源码编译输出的目录 </span><br><span class="line">fastboot flashing unlock </span><br><span class="line">fastboot flashall -w</span><br></pre></td></tr></table></figure>
+<h2 id="Done"><a href="#Done" class="headerlink" title="Done"></a>Done</h2><p>参考链接</p>
+<p><a href="https://source.android.com/setup/build/requirements" target="_blank" rel="noopener">https://source.android.com/setup/build/requirements</a></p>
+<p><a href="https://www.jianshu.com/p/1c3d47b2031f" target="_blank" rel="noopener">https://www.jianshu.com/p/1c3d47b2031f</a></p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
