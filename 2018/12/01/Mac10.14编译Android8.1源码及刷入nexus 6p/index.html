@@ -163,9 +163,7 @@
 </li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/opt/local/bin:$PATH</span><br></pre></td></tr></table></figure>
-<blockquote>
 <p>通过 MacPorts 获取 Make、Git 、 GPG、BISON 软件包</p>
-</blockquote>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg bison</span><br></pre></td></tr></table></figure>
 <h4 id="设置文件描述符数量上限"><a href="#设置文件描述符数量上限" class="headerlink" title="设置文件描述符数量上限"></a>设置文件描述符数量上限</h4><p>在 Mac OS 中，可同时打开的文件描述符的默认数量上限太低，在高度并行的编译流程中，可能会超出此上限。要提高此上限，请将下列行添加到环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)中：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> set the number of open files to be 1024</span><br><span class="line">ulimit -S -n 1024</span><br></pre></td></tr></table></figure>
