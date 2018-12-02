@@ -278,7 +278,7 @@ fastboot flashall -w
 
 参考链接
 
-[https://source.android.com/setup/build/requirements](https://source.android.com/setup/build/requirements)
+[https://source.android.com/setup/build/requirements(https://source.android.com/setup/build/requirements)
 
 [https://www.jianshu.com/p/1c3d47b2031f](https://www.jianshu.com/p/1c3d47b2031f)
 

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="python循环之操作数据源">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>python循环之操作数据源 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="/https">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            python循环之操作数据源
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-02
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/python/" rel="tag">
+                  python
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="循环中的数据源操作"><a href="#循环中的数据源操作" class="headerlink" title="循环中的数据源操作"></a>循环中的数据源操作</h2><p>话不多少先来看段代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> m_list <span class="keyword">in</span> manual_list:</span><br><span class="line">module_dict = m_list.get(<span class="string">'module'</span>)</span><br><span class="line"><span class="keyword">if</span> module_dict[<span class="string">'templateId'</span>] == <span class="number">1</span>:</span><br><span class="line">d_list = m_list.get(<span class="string">'data'</span>)</span><br><span class="line"><span class="keyword">for</span> d <span class="keyword">in</span> d_list:</span><br><span class="line"><span class="keyword">if</span> d.get(<span class="string">'title'</span>) == <span class="string">'奥特曼之最强属性'</span>:</span><br><span class="line">d_list.remove(d)</span><br></pre></td></tr></table></figure>
+<p>数据结构如下</p>
+<p><img src="/var/folders/56/dm9s_xsx5n5d885qn5cpfs000000gn/T/abnerworks.Typora/image-20181202163341608.png" alt="image-20181202163341608"></p>
+<p>由于业务需求需要过滤掉data中title为“奥特曼之最强属性”的数据项，以上代码是否可以完成这一需求？</p>
+<p>经由本地测试完全没问题，于是自信满满的上线了。</p>
+<p>然而过段时间又有了新需求要求将title为“神奇宝贝之无限金币”的数据项也过滤掉，如法炮制,继续hardcode</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> m_list <span class="keyword">in</span> manual_list:</span><br><span class="line">                    module_dict = m_list.get(<span class="string">'module'</span>)</span><br><span class="line">                    <span class="keyword">if</span> module_dict[<span class="string">'templateId'</span>] == <span class="number">1</span>:</span><br><span class="line">                        d_list = m_list.get(<span class="string">'data'</span>)</span><br><span class="line">                        <span class="keyword">for</span> d <span class="keyword">in</span> d_list:</span><br><span class="line">                            <span class="keyword">if</span> d.get(<span class="string">'title'</span>) == <span class="string">'奥特曼之最强属性'</span> <span class="keyword">or</span> d.get(<span class="string">'title'</span>) == <span class="string">'神奇宝贝之无限金币'</span>:</span><br><span class="line">                                d_list.remove(d)</span><br></pre></td></tr></table></figure>
+<p>肯定没问题啊就是加个筛选条件吗！然而结果啪啪打脸，“神奇宝贝之无限金币”数据项并没有过滤掉，经过一番折腾打死也不相信自己这块儿代码写错了，然而只改动了这里，于是找python遍历过程操作数据源的详细过程。</p>
+<p>python循环中删除数据源：</p>
+<p><img src="/var/folders/56/dm9s_xsx5n5d885qn5cpfs000000gn/T/abnerworks.Typora/image-20181202170502018.png" alt="image-20181202170502018"></p>
+<p>删除“奥特曼之最强属性”后数据格式如下：</p>
+<p><img src="/var/folders/56/dm9s_xsx5n5d885qn5cpfs000000gn/T/abnerworks.Typora/image-20181202170934128.png" alt="image-20181202170934128"></p>
+<p>所以，为了避免这种遗漏现象我们采用遍历数据要与要操作的数据源分离的操作方式，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> m_list <span class="keyword">in</span> manual_list:</span><br><span class="line">                    module_dict = m_list.get(<span class="string">'module'</span>)</span><br><span class="line">                    <span class="keyword">if</span> module_dict[<span class="string">'templateId'</span>] == <span class="number">1</span>:</span><br><span class="line">                        d_list = m_list.get(<span class="string">'data'</span>)</span><br><span class="line">                        <span class="keyword">for</span> d <span class="keyword">in</span> d_list[:]:</span><br><span class="line">                            <span class="keyword">if</span> d.get(<span class="string">'title'</span>) == <span class="string">'奥特曼之最强属性'</span> <span class="keyword">or</span> d.get(<span class="string">'title'</span>) == <span class="string">'神奇宝贝之无限金币'</span>:</span><br><span class="line">                                d_list.remove(d)</span><br></pre></td></tr></table></figure>
+<p>d_list[:]拷贝一份作为遍历数据源这样删除操作则不会影响我们要操作的数据源。</p>
+<h2 id="说到拷贝不得不提下深浅拷贝"><a href="#说到拷贝不得不提下深浅拷贝" class="headerlink" title="说到拷贝不得不提下深浅拷贝"></a>说到拷贝不得不提下深浅拷贝</h2><p>无论什么语言都涉及到深浅拷贝，浅拷贝引用同一块内存空间；深拷贝赋值操作后的两个变量的指向的是不同的内存地址。</p>
+<p>python中切片赋值方式则为深拷贝代码：</p>
+<p><img src="/var/folders/56/dm9s_xsx5n5d885qn5cpfs000000gn/T/abnerworks.Typora/image-20181202173053054.png" alt="image-20181202173053054"></p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>推荐使用python自带的filter优化过滤，如果你有更好的方法或者要吐槽的内容欢迎留言。</p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/01/Mac10.14编译Android8.1源码及刷入nexus 6p/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
