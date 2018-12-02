@@ -30,11 +30,12 @@ photos:
 ```css
 box-sizing:content-box; 
 ```
-* IE模型
 
+* IE模型
 ```css
 box-sizing:border-box; 
 ```
+
 布局的传统解决方案，基于盒状模型，依赖 `display` 属性 +  `position`属性 + `float`属性。它对于那些特殊布局非常不方便，比如，垂直居中就不容易实现。
 `display:flex` 弹性盒模型是css3新添加一个用于页面布局的全新CSS3模块功能。它可以把列表放在同一个方向（从左到右或从上到下排列），并且让这些列表能延伸到占用可用的空间。
 
@@ -74,23 +75,36 @@ box-sizing:border-box;
 > flex-direction用来控制子项整体布局方向，是从左往右还是从右往左，是从上往下还是从下往上
 
 `row`是默认值，显示为行。方向为当前文档水平流方向，默认情况下是从左往右。如果当前水平文档流方向是rtl（如设置direction:rtl），则从右往左。
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsj7f6p1dj30t606omx6.jpg)
+
 `row-reverse`显示为行。但方向和`row`属性值是反的。
+
 ![](https://ws4.sinaimg.cn/large/006tNbRwly1fxsjhxptzuj317204sdfv.jpg)
+
 `column`显示为列。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsjhygpxfj31740hwwex.jpg)
+
 `column-reverse`显示为列。但方向和`column`属性值是反的。
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsjhz074hj316m0hmdg9.jpg)
 
 ### 2. flex-wrap:nowrap | wrap | wrap-reverse;
 > `flex-wrap`用来控制子项整体单行显示还是换行显示，如果换行，则下面一行是否反方向显示。
 
 `nowrap`默认值。默认值，表示单行显示，不换行。于是很容易出现宽度溢出的场景。
+
 ![](https://ws4.sinaimg.cn/large/006tNbRwly1fxsjhzedclj30t6054t9c.jpg)
+
 `wrap`宽度不足换行显示。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsjhzuqz9j30vy0860tc.jpg)
+
 `wrap-reverse`宽度不足换行显示，但是是从下往上开始，也就是原本换行在下面的子项现在跑到上面。
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsji0kb06j30so07cwek.jpg)
+
 ### 3.  flex-flow:<‘flex-direction’> || <‘flex-wrap’>
 > flex-flow属性是flex-direction和flex-wrap的缩写，表示flex布局的flow流动特性。例:flex-flow: row-reverse wrap-reverse;
 
@@ -98,49 +112,83 @@ box-sizing:border-box;
 > justify-content属性决定了水平方向子项的对齐和分布方式
 
 `flex-start`是默认值。逻辑CSS属性值，与文档流方向相关。默认表现为左对齐。
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsji1cd6aj30tc04g0sp.jpg)
+
 `flex-end` 逻辑CSS属性值，与文档流方向相关。默认表现为右对齐。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji1rsjmj30ta056gll.jpg)
+
 `center`表现为居中对齐。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji1rsjmj30ta056gll.jpg)
+
 `space-between`表现为两端对齐。between是中间的意思，意思是多余的空白间距只在元素中间区域分配。使用抽象图形示意如下：
 space-between分布效果示意
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsji2ncpsj30ti046mx4.jpg)
+
 `space-around` around是环绕的意思，意思是每个flex子项两侧都环绕互不干扰的等宽的空白间距，最终视觉上边缘两侧的空白只有中间空白宽度一半。使用抽象图形示意如下：
 space-around分布效果示意
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsji396j3j30to04q749.jpg)
+
 `space-evenly`evenly是匀称、平等的意思。也就是视觉上，每个flex子项两侧空白间距完全相等。使用抽象图形
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji3pq45j30tu04k0sp.jpg)
 
 ### 5. align-items: stretch | flex-start | flex-end | center | baseline;
 > align-items中的items指的就是flex单行子项们，因此align-items指的就是flex子项们相对于flex容器在垂直方向上的对齐方式，大家是一起顶部对齐呢，底部对齐呢，还是拉伸对齐呢，类似这样。
 
 `stretch`是默认值。flex子项拉伸。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji4iv1zj30tc06gjre.jpg)
+
 `flex-start` 逻辑CSS属性值，与文档流方向相关。默认表现为容器顶部对齐。
+
 ![](https://ws4.sinaimg.cn/large/006tNbRwly1fxsji52n4wj30sy06mmx6.jpg)
+
 `flex-end` 逻辑CSS属性值，与文档流方向相关。默认表现为容器底部对齐。
+
 ![](https://ws3.sinaimg.cn/large/006tNbRwly1fxsji5iin4j30sy0763yj.jpg)
+
 ` center` 表现为垂直居中对齐。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji6iza8j30sm070wei.jpg)
+
 ` baseline` 表现为所有flex子项都相对于flex容器的基线（字母x的下边缘）对齐。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji7f9z5j30t606omx6.jpg)
+
 ### 6.  align-content:stretch | flex-start | flex-end | center | space-between | space-around | space-evenly;
 > align-content可以看成和justify-content是相似且对立的属性，justify-content指明水平方向flex子项的对齐和分布方式，而align-content则是指明垂直方向每一行flex元素的对齐和分布方式,控制多行。如果所有flex子项只有一行，则align-content属性是没有任何效果的。
 
 `stretch`是默认值。每一行flex子元素都等比例拉伸。例如，如果共两行flex子元素，则每一行拉伸高度是50%。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji7txopj30sy0hit90.jpg)
+
 `flex-start` 逻辑CSS属性值，与文档流方向相关。默认表现为顶部堆砌。
+
 ![](https://ws4.sinaimg.cn/large/006tNbRwly1fxsjvtfhjyj30te0ic3yc.jpg)
+
 `flex-end`逻辑CSS属性值，与文档流方向相关。默认表现为底部堆放。
+
 ![](https://ws3.sinaimg.cn/large/006tNbRwly1fxsji8b4gij30tc0i6glx.jpg)
+
 `center`表现为整体垂直居中对齐。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji8r8m4j30t00iedg5.jpg)
+
 `space-between`表现为上下两行两端对齐。剩下每一行元素等分剩余空间。
+
 ![](https://ws1.sinaimg.cn/large/006tNbRwly1fxsji9pj2nj30u60i4mxh.jpg)
+
 `space-around`每一行元素上下都享有独立不重叠的空白空间。
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsjia73qxj30sq0hq0t1.jpg)
+
 `space-evenly`每一行元素都完全上下等分。
+
 ![](https://ws2.sinaimg.cn/large/006tNbRwly1fxsjvu7ua4j30ts0hw3yc.jpg)
 
 ## 作用在flex子容器上
