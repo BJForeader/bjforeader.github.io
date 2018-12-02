@@ -137,8 +137,8 @@
 <p>这将创建一个.dmg.sparseimage文件，该文件在装载后可用作具有 Android 开发所需格式的驱动盘。 </p>
 <blockquote>
 <p>  按官网所说完成编译至少需要 25GB 空间，相信我，其实至少需要60G。当然，空间大小后面还可以通过以下命令修改 </p>
-  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span>   hdiutil resize -size &lt;new-size-you-want&gt;g ~/android.dmg.sparseimage</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
 </blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdiutil resize -size &lt;new-size-you-want&gt;g ~/android.dmg.sparseimage</span><br></pre></td></tr></table></figure>
 <p>为了方便，我们还可以往环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)添加辅助函数</p>
 <ul>
 <li><p>装载函数</p>
