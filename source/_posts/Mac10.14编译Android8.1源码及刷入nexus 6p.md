@@ -27,26 +27,26 @@ hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 60g ~/andr
 这将创建一个.dmg.sparseimage文件，该文件在装载后可用作具有 Android 开发所需格式的驱动盘。 
 
 >   按官网所说完成编译至少需要 25GB 空间，相信我，其实至少需要60G。当然，空间大小后面还可以通过以下命令修改 
->
->   ```shell
->   hdiutil resize -size <new-size-you-want>g ~/android.dmg.sparseimage
->   ```
+
+```shell
+hdiutil resize -size <new-size-you-want>g ~/android.dmg.sparseimage
+```
 
 为了方便，我们还可以往环境变量配置文件(`~/.bash_profile`--bash，`~/.zshrc`--zsh)添加辅助函数
 
 * 装载函数
 
-  ```shell
-  # mount the android file image
-  mountAndroid() { hdiutil attach ~/android.dmg.sparseimage -mountpoint /Volumes/android; 
-  ```
+```shell
+# mount the android file image
+mountAndroid() { hdiutil attach ~/android.dmg.sparseimage -mountpoint /Volumes/android; 
+```
 
 * 卸载函数
 
-  ```shell
-  # unmount the android file image
-  umountAndroid() { hdiutil detach /Volumes/android; }
-  ```
+```shell
+ # unmount the android file image
+umountAndroid() { hdiutil detach /Volumes/android; }
+```
 ### 安装所需的软件
 
 * JDK
@@ -57,23 +57,23 @@ hdiutil create -type SPARSE -fs 'Case-sensitive Journaled HFS+' -size 60g ~/andr
 
 * Xcode 命令行工具
 
-  ```shell
-  xcode-select --install
-  ```
+```shell
+xcode-select --install
+```
 
 * MacPorts
 
   从[macports.org](http://www.macports.org/install.php) 下载安装,请确保 `/opt/local/bin` 在路径中显示在 `/usr/bin` **前面**。否则，请将以下内容添加到环境变量配置文件(`~/.bash_profile`--bash，`~/.zshrc`--zsh)中：
 
-  ```shell
-  export PATH=/opt/local/bin:$PATH
-  ```
+```shell
+export PATH=/opt/local/bin:$PATH
+```
 
-  > 通过 MacPorts 获取 Make、Git 、 GPG、BISON 软件包
-  >
-  > ```shell
-  > POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg bison
-  > ```
+通过 MacPorts 获取 Make、Git 、 GPG、BISON 软件包
+
+```shell
+POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg bison
+```
 
 #### 设置文件描述符数量上限
 
@@ -92,17 +92,18 @@ Android 源代码树位于由 Google 托管的 Git 代码库中。为了在 Andr
 
 1. 确保主目录下有一个 `bin/` 目录，并且该目录包含在路径中：
 
-   ```shell
-   mkdir ~/bin
-   PATH=~/bin:$PATH
-   ```
+```shell
+mkdir ~/bin
+PATH=~/bin:$PATH
+```
 
 2. 下载 Repo 工具，并确保它可执行
 
-   ```shell
-   curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-   chmod a+x ~/bin/repo
-   ```
+```shell
+curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+chmod a+x ~/bin/repo
+```
+
 ### repo 初始化
 #### 进入我们一开始创建的文件系统,创建一个空目录
 
@@ -210,56 +211,56 @@ make -j8
 
 * 报错日志
 
-  ```shell
-  [44/44] bootstrap out/soong/.minibootstrap/build.ninja.in 
-  [4/4] out/soong/.bootstrap/bin/minibp out/soong/.bootstrap/build.ninja 
-  [860/861] glob vendor///Android.bp 
-  [54/54] out/soong/.bootstrap/bin/soong_build out/soong/build.ninja 
-  FAILED: out/soong/build.ninja 
-  out/soong/.bootstrap/bin/soong_build -t -b out/soong -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp 
-  internal error: Could not find a supported mac sdk: ["10.10" "10.11" "10.12"] 
-  ninja: build stopped: subcommand failed. 
-  17:53:06 soong failed with: exit status 1
-  
-  ```
+```shell
+[44/44] bootstrap out/soong/.minibootstrap/build.ninja.in 
+[4/4] out/soong/.bootstrap/bin/minibp out/soong/.bootstrap/build.ninja 
+[860/861] glob vendor///Android.bp 
+[54/54] out/soong/.bootstrap/bin/soong_build out/soong/build.ninja 
+FAILED: out/soong/build.ninja 
+out/soong/.bootstrap/bin/soong_build -t -b out/soong -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp 
+internal error: Could not find a supported mac sdk: ["10.10" "10.11" "10.12"] 
+ninja: build stopped: subcommand failed. 
+17:53:06 soong failed with: exit status 1
+
+```
 
 * 解决方法
 
   修改/build/soong/cc/config/x86_darwin_host.go文件，添加10.14支持，如下
 
-  ```c++
-  darwinSupportedSdkVersions = []string{
-      "10.10",
-      "10.11",
-      "10.12",
-      "10.14", // 添加mac sdk 10.14
-  }
-  ```
+```c++
+darwinSupportedSdkVersions = []string{
+"10.10",
+"10.11",
+"10.12",
+"10.14", // 添加mac sdk 10.14
+}
+```
 
 #### 遇到bison 错误
 
 * 报错日志
 
-  ```shell
-  FAILED: out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h 
-  BISON_PKGDATADIR=external/bison/data prebuilts/misc/darwin-x86/bison/bison -d --defines=out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h -o out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c external/selinux/checkpolicy/policy_parse.y 
-  [ 0% 309/87784] //external/libcxx:libc++_static header-abi-dumper src/random.cpp [arm] 
-  ninja: build stopped: subcommand failed. 
-  18:05:05 ninja failed with: exit status 1 
-  
-  ```
+```shell
+FAILED: out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h 
+BISON_PKGDATADIR=external/bison/data prebuilts/misc/darwin-x86/bison/bison -d --defines=out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h -o out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c external/selinux/checkpolicy/policy_parse.y 
+[ 0% 309/87784] //external/libcxx:libc++_static header-abi-dumper src/random.cpp [arm] 
+ninja: build stopped: subcommand failed. 
+18:05:05 ninja failed with: exit status 1 
+
+```
 
 * 解决办法
 
-  ```shell
-  cd /Volumes/AOSP/external/bison
-  git cherry-pick c0c852bd6fe462b148475476d9124fd740eba160
-  mm 
-  # 用新生成的bison替换掉原bison文件
-  cp /Volumes/AOSP/out/host/darwin-x86/bin/bison /Volumes/AOSP/prebuilts/misc/darwin-x86/bison/ 
-  # 重新编译
-  make -j8
-  ```
+```shell
+cd /Volumes/AOSP/external/bison
+git cherry-pick c0c852bd6fe462b148475476d9124fd740eba160
+mm 
+# 用新生成的bison替换掉原bison文件
+cp /Volumes/AOSP/out/host/darwin-x86/bin/bison /Volumes/AOSP/prebuilts/misc/darwin-x86/bison/ 
+# 重新编译
+make -j8
+```
 
 ## 刷机
 

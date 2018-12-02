@@ -137,45 +137,45 @@
 <p>这将创建一个.dmg.sparseimage文件，该文件在装载后可用作具有 Android 开发所需格式的驱动盘。 </p>
 <blockquote>
 <p>  按官网所说完成编译至少需要 25GB 空间，相信我，其实至少需要60G。当然，空间大小后面还可以通过以下命令修改 </p>
-  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span>   hdiutil resize -size &lt;new-size-you-want&gt;g ~/android.dmg.sparseimage</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
 </blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hdiutil resize -size &lt;new-size-you-want&gt;g ~/android.dmg.sparseimage</span><br></pre></td></tr></table></figure>
 <p>为了方便，我们还可以往环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)添加辅助函数</p>
 <ul>
-<li><p>装载函数</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> mount the android file image</span><br><span class="line">mountAndroid() &#123; hdiutil attach ~/android.dmg.sparseimage -mountpoint /Volumes/android;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>卸载函数</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> unmount the android file image</span><br><span class="line">umountAndroid() &#123; hdiutil detach /Volumes/android; &#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>装载函数</li>
 </ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> mount the android file image</span><br><span class="line">mountAndroid() &#123; hdiutil attach ~/android.dmg.sparseimage -mountpoint /Volumes/android;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>卸载函数</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"> #</span> unmount the android file image</span><br><span class="line">umountAndroid() &#123; hdiutil detach /Volumes/android; &#125;</span><br></pre></td></tr></table></figure>
 <h3 id="安装所需的软件"><a href="#安装所需的软件" class="headerlink" title="安装所需的软件"></a>安装所需的软件</h3><ul>
 <li><p>JDK</p>
 <p>各种 Android 版本使用的 Java 版本不一样，请参阅相关<a href="https://source.android.com/setup/build/requirements.html#latest-version" target="_blank" rel="noopener">要求</a></p>
 <p>我这里是编译Android8.1.0 ，所以使用java1.8</p>
 </li>
 <li><p>Xcode 命令行工具</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>MacPorts</p>
-<p>从<a href="http://www.macports.org/install.php" target="_blank" rel="noopener">macports.org</a> 下载安装,请确保 <code>/opt/local/bin</code> 在路径中显示在 <code>/usr/bin</code> <strong>前面</strong>。否则，请将以下内容添加到环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)中：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/opt/local/bin:$PATH</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>通过 MacPorts 获取 Make、Git 、 GPG、BISON 软件包</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg bison</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
-</blockquote>
 </li>
 </ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcode-select --install</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>MacPorts</p>
+<p>从<a href="http://www.macports.org/install.php" target="_blank" rel="noopener">macports.org</a> 下载安装,请确保 <code>/opt/local/bin</code> 在路径中显示在 <code>/usr/bin</code> <strong>前面</strong>。否则，请将以下内容添加到环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)中：</p>
+</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=/opt/local/bin:$PATH</span><br></pre></td></tr></table></figure>
+<p>通过 MacPorts 获取 Make、Git 、 GPG、BISON 软件包</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POSIXLY_CORRECT=1 sudo port install gmake libsdl git gnupg bison</span><br></pre></td></tr></table></figure>
 <h4 id="设置文件描述符数量上限"><a href="#设置文件描述符数量上限" class="headerlink" title="设置文件描述符数量上限"></a>设置文件描述符数量上限</h4><p>在 Mac OS 中，可同时打开的文件描述符的默认数量上限太低，在高度并行的编译流程中，可能会超出此上限。要提高此上限，请将下列行添加到环境变量配置文件(<code>~/.bash_profile</code>–bash，<code>~/.zshrc</code>–zsh)中：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> set the number of open files to be 1024</span><br><span class="line">ulimit -S -n 1024</span><br></pre></td></tr></table></figure>
 <h2 id="下载源代码"><a href="#下载源代码" class="headerlink" title="下载源代码"></a>下载源代码</h2><p>Android 源代码树位于由 Google 托管的 Git 代码库中。为了在 Android 环境中更轻松地使用 Git，Google开发了<a href="https://source.android.com/setup/develop/repo.html" target="_blank" rel="noopener">Repo</a>。</p>
 <h3 id="安装-Repo"><a href="#安装-Repo" class="headerlink" title="安装 Repo"></a>安装 Repo</h3><ol>
-<li><p>确保主目录下有一个 <code>bin/</code> 目录，并且该目录包含在路径中：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/bin</span><br><span class="line">PATH=~/bin:$PATH</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>下载 Repo 工具，并确保它可执行</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo</span><br><span class="line">chmod a+x ~/bin/repo</span><br></pre></td></tr></table></figure>
-</li>
+<li>确保主目录下有一个 <code>bin/</code> 目录，并且该目录包含在路径中：</li>
 </ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/bin</span><br><span class="line">PATH=~/bin:$PATH</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>下载 Repo 工具，并确保它可执行</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl https://storage.googleapis.com/git-repo-downloads/repo &gt; ~/bin/repo</span><br><span class="line">chmod a+x ~/bin/repo</span><br></pre></td></tr></table></figure>
 <h3 id="repo-初始化"><a href="#repo-初始化" class="headerlink" title="repo 初始化"></a>repo 初始化</h3><h4 id="进入我们一开始创建的文件系统-创建一个空目录"><a href="#进入我们一开始创建的文件系统-创建一个空目录" class="headerlink" title="进入我们一开始创建的文件系统,创建一个空目录"></a>进入我们一开始创建的文件系统,创建一个空目录</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">➜  ~ mountAndroid</span><br><span class="line">/dev/disk3          	GUID_partition_scheme</span><br><span class="line">/dev/disk3s1        	EFI</span><br><span class="line">/dev/disk3s2        	Apple_HFS                      	/Volumes/android</span><br><span class="line">➜  ~ cd /Volumes/android</span><br><span class="line">➜  ~ mkdir aosp</span><br><span class="line">➜  ~ cd aosp</span><br></pre></td></tr></table></figure>
 <h4 id="指定需要checkout对应的源代码标记和编译版本"><a href="#指定需要checkout对应的源代码标记和编译版本" class="headerlink" title="指定需要checkout对应的源代码标记和编译版本"></a>指定需要checkout对应的<a href="https://source.android.com/setup/start/build-numbers.html#source-code-tags-and-builds" target="_blank" rel="noopener">源代码标记和编译版本</a></h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repo init -u https://android.googlesource.com/platform/manifest -b android-8.1.0_r50</span><br></pre></td></tr></table></figure>
 <p>初始化成功后，目录中应包含一个 <code>.repo</code> 目录。</p>
@@ -194,22 +194,23 @@
 <h3 id="编译代码"><a href="#编译代码" class="headerlink" title="编译代码"></a>编译代码</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j8</span><br></pre></td></tr></table></figure>
 <p><code>-jN</code> 表示编译并行任务数，这个示电脑情况而定，一般取cpu数的1～2倍就可以</p>
 <h3 id="编译遇到问题"><a href="#编译遇到问题" class="headerlink" title="编译遇到问题"></a>编译遇到问题</h3><h4 id="找不到对应的macOS-sdk"><a href="#找不到对应的macOS-sdk" class="headerlink" title="找不到对应的macOS.sdk"></a>找不到对应的macOS.sdk</h4><ul>
-<li><p>报错日志</p>
+<li>报错日志</li>
+</ul>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[44/44] bootstrap out/soong/.minibootstrap/build.ninja.in </span><br><span class="line">[4/4] out/soong/.bootstrap/bin/minibp out/soong/.bootstrap/build.ninja </span><br><span class="line">[860/861] glob vendor///Android.bp </span><br><span class="line">[54/54] out/soong/.bootstrap/bin/soong_build out/soong/build.ninja </span><br><span class="line">FAILED: out/soong/build.ninja </span><br><span class="line">out/soong/.bootstrap/bin/soong_build -t -b out/soong -d out/soong/build.ninja.d -o out/soong/build.ninja Android.bp </span><br><span class="line">internal error: Could not find a supported mac sdk: ["10.10" "10.11" "10.12"] </span><br><span class="line">ninja: build stopped: subcommand failed. </span><br><span class="line">17:53:06 soong failed with: exit status 1</span><br></pre></td></tr></table></figure>
-</li>
+<ul>
 <li><p>解决方法</p>
 <p>修改/build/soong/cc/config/x86_darwin_host.go文件，添加10.14支持，如下</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">darwinSupportedSdkVersions = []<span class="built_in">string</span>&#123;</span><br><span class="line">    <span class="string">"10.10"</span>,</span><br><span class="line">    <span class="string">"10.11"</span>,</span><br><span class="line">    <span class="string">"10.12"</span>,</span><br><span class="line">    <span class="string">"10.14"</span>, <span class="comment">// 添加mac sdk 10.14</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">darwinSupportedSdkVersions = []<span class="built_in">string</span>&#123;</span><br><span class="line"><span class="string">"10.10"</span>,</span><br><span class="line"><span class="string">"10.11"</span>,</span><br><span class="line"><span class="string">"10.12"</span>,</span><br><span class="line"><span class="string">"10.14"</span>, <span class="comment">// 添加mac sdk 10.14</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="遇到bison-错误"><a href="#遇到bison-错误" class="headerlink" title="遇到bison 错误"></a>遇到bison 错误</h4><ul>
-<li><p>报错日志</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FAILED: out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h </span><br><span class="line">BISON_PKGDATADIR=external/bison/data prebuilts/misc/darwin-x86/bison/bison -d --defines=out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h -o out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c external/selinux/checkpolicy/policy_parse.y </span><br><span class="line">[ 0% 309/87784] //external/libcxx:libc++_static header-abi-dumper src/random.cpp [arm] </span><br><span class="line">ninja: build stopped: subcommand failed. </span><br><span class="line">18:05:05 ninja failed with: exit status 1</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>解决办法</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd /Volumes/AOSP/external/bison</span><br><span class="line">git cherry-pick c0c852bd6fe462b148475476d9124fd740eba160</span><br><span class="line">mm </span><br><span class="line"><span class="meta">#</span> 用新生成的bison替换掉原bison文件</span><br><span class="line">cp /Volumes/AOSP/out/host/darwin-x86/bin/bison /Volumes/AOSP/prebuilts/misc/darwin-x86/bison/ </span><br><span class="line"><span class="meta">#</span> 重新编译</span><br><span class="line">make -j8</span><br></pre></td></tr></table></figure>
-</li>
+<li>报错日志</li>
 </ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">FAILED: out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h </span><br><span class="line">BISON_PKGDATADIR=external/bison/data prebuilts/misc/darwin-x86/bison/bison -d --defines=out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.h -o out/soong/.intermediates/external/selinux/checkpolicy/checkpolicy/darwin_x86_64/gen/yacc/external/selinux/checkpolicy/policy_parse.c external/selinux/checkpolicy/policy_parse.y </span><br><span class="line">[ 0% 309/87784] //external/libcxx:libc++_static header-abi-dumper src/random.cpp [arm] </span><br><span class="line">ninja: build stopped: subcommand failed. </span><br><span class="line">18:05:05 ninja failed with: exit status 1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>解决办法</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cd /Volumes/AOSP/external/bison</span><br><span class="line">git cherry-pick c0c852bd6fe462b148475476d9124fd740eba160</span><br><span class="line">mm </span><br><span class="line"><span class="meta">#</span> 用新生成的bison替换掉原bison文件</span><br><span class="line">cp /Volumes/AOSP/out/host/darwin-x86/bin/bison /Volumes/AOSP/prebuilts/misc/darwin-x86/bison/ </span><br><span class="line"><span class="meta">#</span> 重新编译</span><br><span class="line">make -j8</span><br></pre></td></tr></table></figure>
 <h2 id="刷机"><a href="#刷机" class="headerlink" title="刷机"></a>刷机</h2><p>经过漫长的等待和反复折腾后，终于到了最后一步—刷机。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span> 手机连接电脑情况下</span><br><span class="line">adb reboot bootloader </span><br><span class="line"><span class="meta">#</span> 进入源码编译输出的目录 </span><br><span class="line">fastboot flashing unlock </span><br><span class="line">fastboot flashall -w</span><br></pre></td></tr></table></figure>
 <h2 id="Done"><a href="#Done" class="headerlink" title="Done"></a>Done</h2><p>参考链接</p>
