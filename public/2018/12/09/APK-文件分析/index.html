@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="APK 文件分析">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>APK 文件分析 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            APK 文件分析
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-09
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/源码/" rel="tag">
+                  源码
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>我们通过 Android studio APK  Analyze 可以展开一个APK文件<br><img src="https://blog-1256390809.cos.ap-beijing.myqcloud.com/1544282880767.jpg" alt=""></p>
+<ul>
+<li>META-INF</li>
+<li>res<ul>
+<li>anim</li>
+<li>color</li>
+<li>drawable</li>
+<li>drawable-hdpi</li>
+<li>drawable-land</li>
+<li>drawable-land-hdpi</li>
+<li>drawable-mdpi</li>
+<li>drawable-port</li>
+<li>drawable-port-hdpi</li>
+<li>layout</li>
+<li>layout-land</li>
+<li>layout-port</li>
+<li>xml</li>
+</ul>
+</li>
+<li>AndroidManifest.xml</li>
+<li>classes.dex</li>
+<li>resources.arsc</li>
+</ul>
+<h2 id="META-INF"><a href="#META-INF" class="headerlink" title="META-INF"></a>META-INF</h2><p>META-INF目录下存放的是签名信息，用来保证apk包的完整性和系统的安全。里面包含了三个文件，MANIFEST.MF、CERT.SF、CERT.RSA。 </p>
+<ul>
+<li>MANIFEST.MF</li>
+</ul>
+<p>apk中的这个MANIFEST.MF，列出了apk的所有文件，以及这些文件内容所对应的base64-encoded SHA1 哈希值，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Name: classes.dex</span><br><span class="line">SHA1-Digest: l8Lc+gtdLvtxJ1K+kscUmWQGQ1E=</span><br></pre></td></tr></table></figure>
+<p>上述表示classes.dex这个文件的SHA1的哈希值为l8Lc+gtdLvtxJ1K+kscUmWQGQ1E=</p>
+<ul>
+<li>CERT.SF</li>
+</ul>
+<p>CERT.SF和MANIFEST.MF很相似，但是它描述的不是文件内容的hash值，而是列出了MANIFEST.MF这个文件中每条信息的hash值，举例会明白些：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Name: classes.dex</span><br><span class="line">SHA1-Digest: ubmMiUS24rU/<span class="number">6</span>K5JloMVG4vHKIU=</span><br></pre></td></tr></table></figure>
+<p>上面这条hash值<code>ubmMiUS24rU/6K5JloMVG4vHKIU=</code>对应的是MANIFEST.MF中下面这几行字符串的hash值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Name: classes.dex</span><br><span class="line">SHA1-Digest: l8Lc+gtdLvtxJ1K+kscUmWQGQ1E=</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注：计算SHA1-Digest-Manifest时，输入的字符串是三行，还要包括一行空白行，即’\r\n’。！</p>
+</blockquote>
+<ul>
+<li><p>CERT.RSA</p>
+<p>包含了公钥和私钥签名后的一些信息<br>它的基本格式是这样的：<br><img src="https://blog-1256390809.cos.ap-beijing.myqcloud.com/1544283129630.jpg" alt=""></p>
+</li>
+</ul>
+<h2 id="res目录"><a href="#res目录" class="headerlink" title="res目录"></a>res目录</h2><p>res目录存放资源文件</p>
+<table>
+<thead>
+<tr>
+<th>目录</th>
+<th>资源类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>animator/</code></td>
+<td>用于定义<a href="https://developer.android.com/guide/topics/graphics/prop-animation.html?hl=zh-cn" target="_blank" rel="noopener">属性动画</a>的 XML 文件。</td>
+</tr>
+<tr>
+<td><code>anim/</code></td>
+<td>定义<a href="https://developer.android.com/guide/topics/graphics/view-animation.html?hl=zh-cn#tween-animation" target="_blank" rel="noopener">渐变动画</a>的 XML 文件。（属性动画也可以保存在此目录中，但是为了区分这两种类型，属性动画首选 <code>animator/</code> 目录。）</td>
+</tr>
+<tr>
+<td><code>color/</code></td>
+<td>用于定义颜色状态列表的 XML 文件。请参阅<a href="https://developer.android.com/guide/topics/resources/color-list-resource.html?hl=zh-cn" target="_blank" rel="noopener">颜色状态列表资源</a></td>
+</tr>
+<tr>
+<td><code>drawable/</code></td>
+<td>位图文件（<code>.png</code>、<code>.9.png</code>、<code>.jpg</code>、<code>.gif</code>）或编译为以下可绘制对象资源子类型的 XML 文件：位图文件九宫格（可调整大小的位图）状态列表形状动画可绘制对象其他可绘制对象请参阅 <a href="https://developer.android.com/guide/topics/resources/drawable-resource.html?hl=zh-cn" target="_blank" rel="noopener">可绘制对象资源</a>。</td>
+</tr>
+<tr>
+<td><code>mipmap/</code></td>
+<td>适用于不同启动器图标密度的可绘制对象文件。如需了解有关使用 <code>mipmap/</code> 文件夹管理启动器图标的详细信息，请参阅<a href="https://developer.android.com/tools/projects/index.html?hl=zh-cn#mipmap" target="_blank" rel="noopener">管理项目概览</a>。</td>
+</tr>
+<tr>
+<td><code>layout/</code></td>
+<td>用于定义用户界面布局的 XML 文件。 请参阅<a href="https://developer.android.com/guide/topics/resources/layout-resource.html?hl=zh-cn" target="_blank" rel="noopener">布局资源</a>。</td>
+</tr>
+<tr>
+<td><code>menu/</code></td>
+<td>用于定义应用菜单（如选项菜单、上下文菜单或子菜单）的 XML 文件。请参阅<a href="https://developer.android.com/guide/topics/resources/menu-resource.html?hl=zh-cn" target="_blank" rel="noopener">菜单资源</a>。</td>
+</tr>
+<tr>
+<td><code>raw/</code></td>
+<td>要以原始形式保存的任意文件。要使用原始 <code>InputStream</code> 打开这些资源，请使用资源 ID（即 <code>R.raw.*filename*</code>）调用 <code>Resources.openRawResource()</code>。但是，如需访问原始文件名和文件层次结构，则可以考虑将某些资源保存在 <code>assets/</code> 目录下（而不是 <code>res/raw/</code>）。<code>assets/</code> 中的文件没有资源 ID，因此您只能使用 <code>AssetManager</code> 读取这些文件。</td>
+</tr>
+<tr>
+<td><code>values/</code></td>
+<td>包含字符串、整型数和颜色等简单值的 XML 文件。其他 <code>res/</code> 子目录中的 XML 资源文件是根据 XML 文件名定义单个资源，而 <code>values/</code> 目录中的文件可描述多个资源。对于此目录中的文件，<code>&lt;resources&gt;</code> 元素的每个子元素均定义一个资源。例如，<code>&lt;string&gt;</code> 元素创建 <code>R.string</code> 资源，<code>&lt;color&gt;</code> 元素创建 <code>R.color</code> 资源。由于每个资源均用其自己的 XML 元素定义，因此您可以根据自己的需要命名文件，并将不同的资源类型放在一个文件中。但是，为了清晰起见，您可能需要将独特的资源类型放在不同的文件中。 例如，对于可在此目录中创建的资源，下面给出了相应的文件名约定：arrays.xml，用于资源数组（<a href="https://developer.android.com/guide/topics/resources/more-resources.html?hl=zh-cn#TypedArray" target="_blank" rel="noopener">类型化数组</a>）。colors.xml：<a href="https://developer.android.com/guide/topics/resources/more-resources.html?hl=zh-cn#Color" target="_blank" rel="noopener">颜色值</a>。dimens.xml：<a href="https://developer.android.com/guide/topics/resources/more-resources.html?hl=zh-cn#Dimension" target="_blank" rel="noopener">尺寸值</a>。strings.xml：<a href="https://developer.android.com/guide/topics/resources/string-resource.html?hl=zh-cn" target="_blank" rel="noopener">字符串值</a>。styles.xml：<a href="https://developer.android.com/guide/topics/resources/style-resource.html?hl=zh-cn" target="_blank" rel="noopener">样式</a>。请参阅<a href="https://developer.android.com/guide/topics/resources/string-resource.html?hl=zh-cn" target="_blank" rel="noopener">字符串资源</a>、<a href="https://developer.android.com/guide/topics/resources/style-resource.html?hl=zh-cn" target="_blank" rel="noopener">样式资源</a>和<a href="https://developer.android.com/guide/topics/resources/more-resources.html?hl=zh-cn" target="_blank" rel="noopener">更多资源类型</a>。</td>
+</tr>
+<tr>
+<td><code>xml/</code></td>
+<td>可以在运行时通过调用 <code>Resources.getXML()</code> 读取的任意 XML 文件。各种 XML 配置文件（如<a href="https://developer.android.com/guide/topics/search/searchable-config.html?hl=zh-cn" target="_blank" rel="noopener">可搜索配置</a>）都必须保存在此处。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="resources-arsc"><a href="#resources-arsc" class="headerlink" title="resources.arsc"></a>resources.arsc</h2><p>编译后的二进制资源文件，主要作用是App的资源索引表，可以从二进制的文件中查找到资源的相关信息，或者根据资源的id可以定位到二进制文件中的位置</p>
+<h2 id="classes-dex文件"><a href="#classes-dex文件" class="headerlink" title="classes.dex文件"></a>classes.dex文件</h2><p>简单来说就是android系统的可执行文件，类似于window系统的xx.exe,它包含应用程序的全部操作指令以及运行时数据</p>
+<h2 id="题外：ART-和-Dalvik"><a href="#题外：ART-和-Dalvik" class="headerlink" title="题外：ART 和 Dalvik"></a>题外：ART 和 Dalvik</h2><p>我们知道Java程序都是通过Java虚拟机执行的，Android应用是采用Java开发的，基于移动设备的特点，如内存以及电量等诸多方面跟一般的 PC 设备都有本质的区别，所以需要开发更符合移动设备的用于执行 Java 代码的虚拟机，也就是Dalvik和 ART。<br>Dalvik和 ART 并不是完全按照JVM的规范开发的，一般JVM虚拟机运行的是 .class 文件，而 Dalvik和 ART 运行的是DEX文件。</p>
+<blockquote>
+<p>Java 虚拟机执行 .class 格式的字节码。每一个 Java 文件对应一个 .class 的字节码文件，JVM 在运行时为每一个执行到的类装载字节码。而 Android 设备上为了提高执行效率，在编译 Android 项目时，Android 通过 SDK 提供的工具 dex.jar 会把所有的 .class 文件最终打包成一个或者多个 .dex 文件</p>
+</blockquote>
+<h3 id="ART-和-Dalvik-区别"><a href="#ART-和-Dalvik-区别" class="headerlink" title="ART 和 Dalvik 区别"></a>ART 和 Dalvik 区别</h3><p>Dalvik 是 ART 的前身 ，从 Android L 开始，Android 开始启用了新设计的虚拟机 ART 。<br>ART 比起 Dalvik 有以下优势：</p>
+<ul>
+<li>预先 (AOT) 编译</li>
+</ul>
+<p>ART 引入了预先编译机制，可提高应用的性能。在安装时，ART 使用设备自带的 <code>dex2oat</code> 工具来编译应用，并为目标设备生成经过编译的应用可执行文件</p>
+<ul>
+<li>垃圾回收方面的优化</li>
+</ul>
+<p>我们知道<strong>执行GC操作的时候，任何线程的任何操作都会需要暂停，等待GC操作完成之后，其他操作才能够继续运行</strong>，所以GC在 Dalvik 时代也是经常被人诟病的，它会导致界面卡顿。而ART 在GC导致显示不稳定、界面响应速度缓慢以及其他问题都做了优化</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="http://www.chenglong.ren/2016/12/30/android%E4%B8%AD%E7%AD%BE%E5%90%8D%E5%8E%9F%E7%90%86%E5%92%8C%E5%AE%89%E5%85%A8%E6%80%A7%E5%88%86%E6%9E%90%E4%B9%8Bmeta-inf%E6%96%87%E4%BB%B6%E8%AE%B2%E8%A7%A3/" target="_blank" rel="noopener">android中签名原理和安全性分析之meta-inf文件讲解</a><br><a href="https://source.android.com/devices/tech/dalvik" target="_blank" rel="noopener">https://source.android.com/devices/tech/dalvik</a></p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/02/python循环之操作数据源/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
