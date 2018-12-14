@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="vue预渲染">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>vue预渲染 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            vue预渲染
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-12
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/vue/" rel="tag">
+                  vue
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p> Ajax 技术的出现，让我们的 Web 应用能够在不刷新的状态下显示不同页面的内容。在一个单页应用中，往往只有一个 html 文件，然后根据访问的 url 来匹配对应的路由脚本，动态地渲染页面内容。单页应用在优化了用户体验的同时，也给我们带来了许多问题，例如 SEO 不友好、首屏可见时间过长等。服务端渲染（SSR）和预渲染（Prerender）技术正是为解决这些问题而生的。</p>
+<h2 id="服务器端渲染-vs-预渲染"><a href="#服务器端渲染-vs-预渲染" class="headerlink" title="服务器端渲染 vs 预渲染"></a>服务器端渲染 vs 预渲染</h2><p>客户端渲染：用户访问 url，请求 html 文件，前端根据路由动态渲染页面内容。关键链路较长，有一定的白屏时间；</p>
+<p>服务端渲染：用户访问 url，服务端根据访问路径请求所需数据，拼接成 html 字符串，返回给前端。前端接收到 html 时已有部分内容；<a href="https://ssr.vuejs.org/zh/" target="_blank" rel="noopener">服务端渲染介绍</a></p>
+<p>预渲染：构建阶段生成匹配预渲染路径的 html 文件（注意：每个需要预渲染的路由都有一个对应的 html）。构建出来的 html 文件已有部分内容。</p>
+<p>针对单页应用，服务端渲染和预渲染共同解决的问题：</p>
+<ol>
+<li>SEO：单页应用的网站内容是根据当前路径动态渲染的，html 文件中往往没有内容，网络爬虫不会等到页面脚本执行完再抓取；</li>
+<li>弱网环境：当用户在一个弱环境中访问你的站点时，你会想要尽可能快的将内容呈现给他们。甚至是在 js 脚本被加载和解析前；</li>
+<li>低版本浏览器：用户的浏览器可能不支持你使用的 js 特性，预渲染或服务端渲染能够让用户至少能够看到首屏的内容，而不是一个空白的网页。</li>
+</ol>
+<h2 id="Prerender-SPA-Plugin"><a href="#Prerender-SPA-Plugin" class="headerlink" title="Prerender SPA Plugin"></a>Prerender SPA Plugin</h2><p>由于我们的项目是使用webpack + vue-cli构建的，也就是说这是个用webpack进行打包的单页应用。<br>在路由方面选择的是vue-router，mode是hash模式。使用这个<a href="https://www.npmjs.com/package/prerender-spa-plugin" target="_blank" rel="noopener">prerender-spa-plugin</a>配置起来比较简单</p>
+<h5 id="配置Prerender-SPA-Plugin"><a href="#配置Prerender-SPA-Plugin" class="headerlink" title="配置Prerender SPA Plugin"></a>配置Prerender SPA Plugin</h5><ol>
+<li><p>安装需要将代理设置为全局 因为关联Puppeteer 需要下载Chromium否则会一直处于node install.js 安装失败</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install prerender-spa-plugin --save-dev</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>配置webpack<br>在webpack中配置 prerender-spa-plugin<br>配置先弄懂要配置在哪个文件里，配置是否生效。 vue-cli2 的配置文件很多，对这些文件不了解的话，很容易配置错地方。<br>这个配置只需要在 build 的时候可以生成预渲染好的html，所以应该配置在 build/webpack.prod.conf.js 这个文件里。<br><a href="https://blog.csdn.net/Mr_YanYan/article/details/79233188" target="_blank" rel="noopener">vue-cli配置文件详解</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">//引入prerender-spa-plugin插件</span><br><span class="line">const PrerenderSPAPlugin = require(&apos;prerender-spa-plugin&apos;)</span><br><span class="line">const Renderer = PrerenderSPAPlugin.PuppeteerRenderer</span><br><span class="line">//在文件找到plugins 属性 放到最后</span><br><span class="line">plugins:[</span><br><span class="line">        new PrerenderSPAPlugin(&#123;</span><br><span class="line">            // 生成文件的路径，也可以与webpakc打包的一致。</span><br><span class="line">            // 这个目录只能有一级，如果目录层次大于一级，在生成的时候不会有任何错误提示，在预渲染的时候只会卡着不动。</span><br><span class="line">            staticDir: path.join(__dirname, &apos;../dist&apos;),</span><br><span class="line">           </span><br><span class="line">            // 对应自己的路由文件，比如index有参数，就需要写成 /index/param1。</span><br><span class="line">            routes: [&apos;/home&apos;, ],</span><br><span class="line">            </span><br><span class="line">            // 这个很重要，如果没有配置这段，也不会进行预编译</span><br><span class="line">            renderer: new Renderer(&#123;</span><br><span class="line">                inject: &#123;</span><br><span class="line">                  foo: &apos;bar&apos;</span><br><span class="line">                &#125;,</span><br><span class="line">                headless: false,</span><br><span class="line">                // 在 main.js 中 document.dispatchEvent(new Event(&apos;render-event&apos;))，两者的事件名称要对应上。</span><br><span class="line">                renderAfterDocumentEvent: &apos;render-event&apos;</span><br><span class="line">            &#125;)</span><br><span class="line">        &#125;)</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在main.js中加入 document.dispatchEvent(new Event(‘render-event’))</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">new Vue(&#123;</span><br><span class="line">  el: &apos;#app&apos;,</span><br><span class="line">  created() &#123;</span><br><span class="line">    //解决页面刷新数据丢失的问题</span><br><span class="line">    //在页面加载时读取sessionStorage里的状态信息</span><br><span class="line">    if (sessionStorage.getItem(&quot;store&quot;)) &#123;</span><br><span class="line">      this.$store.replaceState(Object.assign(&#123;&#125;, this.$store.state, JSON.parse(sessionStorage.getItem(&quot;store&quot;))))</span><br><span class="line">      sessionStorage.removeItem(&quot;store&quot;)</span><br><span class="line">    &#125;</span><br><span class="line">    //在页面刷新时将vuex里的信息保存到sessionStorage里</span><br><span class="line">    window.addEventListener(&quot;beforeunload&quot;, () =&gt; &#123;</span><br><span class="line">      sessionStorage.setItem(&quot;store&quot;, JSON.stringify(this.$store.state))</span><br><span class="line">      sessionStorage.setItem(&quot;CHANNL_ID&quot;, CHANNL_ID)</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;,</span><br><span class="line">  mounted()&#123;</span><br><span class="line">    document.dispatchEvent(new Event(&apos;render-event&apos;))</span><br><span class="line">  &#125;,</span><br><span class="line">  components: &#123;App&#125;,</span><br><span class="line">  template: &apos;&lt;App/&gt;&apos;,</span><br><span class="line">  router,</span><br><span class="line">  store</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>将路由改成history模式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">export default new Router(&#123;</span><br><span class="line">  mode:&apos;history&apos;,</span><br><span class="line">  routes,&#125;)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>执行 npm run build<br>一切顺利的话将在 dist 目录 下生成 在webpack.prod.conf.js配置了路由的文件夹 例如我配置的 /home<br><img src="https://ws3.sinaimg.cn/large/006tNbRwgy1fy4ephqmaxj30y80auq35.jpg" alt=""><br>home文件下存在index.html<br><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fy4eqjv7caj311e0c274g.jpg" alt=""><br>查看源码已经预渲染ok了<br><img src="https://ws2.sinaimg.cn/large/006tNbRwgy1fy4esdgtuoj325l0u0aj0.jpg" alt=""><br>没有预渲染的页面<br><img src="https://ws1.sinaimg.cn/large/006tNbRwgy1fy4euu1kuij326s0js42r.jpg" alt=""><br>对比我们未预渲染的页面，我们预渲染页面中生成了dom结构让我们访问更快</p>
+</li>
+<li>改变服务器访问的地址，判断访问的路由是否预渲染了，如果是 直接访问预渲染生成的index.html 否则保持原样访问根html<h2 id="爬坑"><a href="#爬坑" class="headerlink" title="爬坑"></a>爬坑</h2><ul>
+<li>页面重新加载<br><br>查看文档需要在根节点上也就是 id=app 添加  data-server-rendered=”true”属性 告诉vue 这个页面不需要再重新渲染了</li>
+<li>只加载一屏幕图片<br><br>是由于我们的页面是使用了图片懒加载的问题，在预渲染的时候只生成了一屏幕的图片，其他图片的地址放到了data-src中。我们预渲染的dom已经生成了 不会再请求图片地址了<br>去掉图片属性的 v-lazy 改成 :src 直接引用地址  </li>
+<li>生成的页面在本地服务器调试没有问题，上测试服务器后页面不能点击(未解决)<br><a href="https://github.com/chrisvfritz/prerender-spa-plugin/issues/24" target="_blank" rel="noopener">页面点击问题，参考文档</a><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><a href="https://markus.oberlehner.net/blog/how-to-pre-render-vue-powered-websites-with-webpack/" target="_blank" rel="noopener">How to Pre-render Vue.js Powered Websites With webpack</a><br></li>
+</ul>
+</li>
+</ol>
+<p><a href="https://github.com/chrisvfritz/prerender-spa-plugin" target="_blank" rel="noopener">prerender-spa-plugin github</a> </p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/09/gzip压缩/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
