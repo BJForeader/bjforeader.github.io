@@ -160,10 +160,11 @@
 <li>改变服务器访问的地址，判断访问的路由是否预渲染了，如果是 直接访问预渲染生成的index.html 否则保持原样访问根html<h2 id="爬坑"><a href="#爬坑" class="headerlink" title="爬坑"></a>爬坑</h2><ul>
 <li>页面重新加载<br><br>查看文档需要在根节点上也就是 id=app 添加  data-server-rendered=”true”属性 告诉vue 这个页面不需要再重新渲染了</li>
 <li>只加载一屏幕图片<br><br>是由于我们的页面是使用了图片懒加载的问题，在预渲染的时候只生成了一屏幕的图片，其他图片的地址放到了data-src中。我们预渲染的dom已经生成了 不会再请求图片地址了<br>去掉图片属性的 v-lazy 改成 :src 直接引用地址  </li>
-<li>生成的页面在本地服务器调试没有问题，上测试服务器后页面不能点击(未解决)<br><a href="https://github.com/chrisvfritz/prerender-spa-plugin/issues/24" target="_blank" rel="noopener">页面点击问题，参考文档</a><h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><a href="https://markus.oberlehner.net/blog/how-to-pre-render-vue-powered-websites-with-webpack/" target="_blank" rel="noopener">How to Pre-render Vue.js Powered Websites With webpack</a><br></li>
+<li>生成的页面在本地服务器调试没有问题，上测试服务器后页面不能点击(未解决)<br><a href="https://github.com/chrisvfritz/prerender-spa-plugin/issues/24" target="_blank" rel="noopener">页面点击问题，参考文档</a></li>
 </ul>
 </li>
 </ol>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://markus.oberlehner.net/blog/how-to-pre-render-vue-powered-websites-with-webpack/" target="_blank" rel="noopener">How to Pre-render Vue.js Powered Websites With webpack</a><br></p>
 <p><a href="https://github.com/chrisvfritz/prerender-spa-plugin" target="_blank" rel="noopener">prerender-spa-plugin github</a> </p>
 
         </div>
@@ -182,6 +183,10 @@
     </div>
     <!-- Pre or Next -->
     <div class="nav-links">
+      
+        <div class="nav-previous">
+          <a href="/2018/12/15/Glide看点（二）巧用Fragment管理生命周期/" rel="prev"><span class="meta-arraw meta-arraw-left"></span> 上一页</a>
+        </div>
       
       
         <div class="nav-next">
