@@ -139,7 +139,7 @@
 </ol>
 <p>如上所诉，要是有一个很方便调试远程服务器的方法，岂不美哉。通过PyCharm我们可以很方便地实现远程调试，下面详细介绍下PyCharm这个牛叉的功能。</p>
 <h2 id="添加远程部署"><a href="#添加远程部署" class="headerlink" title="添加远程部署"></a>添加远程部署</h2><ol>
-<li>打开pycharm，tools-&gt;Deployment-&gt;Configuration, 在左边栏点“+“号添加远程服务器。</li>
+<li>打开pycharm，tools–&gt;Deployment–&gt;Configuration</li>
 </ol>
 <p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fy8xrz7r2oj310d0u07wh.jpg" alt=""></p>
 <ol start="2">
@@ -163,7 +163,7 @@
 <p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy8yw6bdovj313r0u07wh.jpg" alt=""></p>
 <p>新增一个文件，查看deployment 选项，这时候就可以上传到远程服务器了</p>
 <p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy8z53cccrj31by0msjyp.jpg" alt=""></p>
-<h2 id="远程解释器"><a href="#远程解释器" class="headerlink" title="远程解释器"></a>远程解释器</h2><p>远程部署仅仅只是同步和拷贝文件，要真正远程调试还需要配置远程解释器</p>
+<h2 id="添加远程解释器"><a href="#添加远程解释器" class="headerlink" title="添加远程解释器"></a>添加远程解释器</h2><p>远程部署仅仅只是同步和拷贝文件，要真正实现远程调试还需要配置远程解释器</p>
 <ol>
 <li>设置页面找到“Project Interpreter” –&gt; 设置–&gt;Add</li>
 </ol>
@@ -186,7 +186,7 @@
 </ol>
 <p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy8zxkrmqmj30bm06amyi.jpg" alt=""></p>
 <p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy900lq1qsj30d00tgafe.jpg" alt=""></p>
-<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy901qpar0j315a0lkwh7.jpg" alt=""></p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy91brol9sj315a0lktco.jpg" alt=""></p>
 <ol start="2">
 <li>运行脚本代码如下，这里使用了8000的端口</li>
 </ol>
@@ -199,11 +199,11 @@
 </ol>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">  server &#123;</span><br><span class="line">      listen       8000 ;</span><br><span class="line">      listen       [::]:8000 ;</span><br><span class="line">      server_name  _;</span><br><span class="line">      root         /usr/share/nginx/html;</span><br><span class="line">      access_log  /var/log/nginx/access_8000.log  main;</span><br><span class="line">      error_log  /var/log/nginx/error_8000.log;</span><br><span class="line"></span><br><span class="line">      # Load configuration files for the default server block.</span><br><span class="line">      include /etc/nginx/default.d/*.conf;</span><br><span class="line">      location / &#123;</span><br><span class="line">proxy_pass http://127.0.0.1:8000;</span><br><span class="line">proxy_set_header Host $host;</span><br><span class="line">proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      error_page 404 /404.html;</span><br><span class="line">          location = /40x.html &#123;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      error_page 500 502 503 504 /50x.html;</span><br><span class="line">          location = /50x.html &#123;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
 <ol start="4">
-<li>要是使用阿里云，还需要安全组开放8000 端</li>
+<li>要是使用阿里云，还需要安全组开放8000 端口</li>
 <li>断点运行</li>
 </ol>
 <p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy90aeah0dj30e0048glz.jpg" alt=""></p>
-<p><img src="/Users/apple/Library/Application Support/typora-user-images/image-20181216233413216.png" alt="image-20181216233413216"></p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy9170wpemj30qg01w3yv.jpg" alt=""></p>
 <ol start="6">
 <li>出现上图所示的时候，恭喜你，你已经可以断点调试远程服务器了</li>
 </ol>
