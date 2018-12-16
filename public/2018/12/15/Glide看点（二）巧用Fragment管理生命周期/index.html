@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="Glide看点（二）巧用Fragment管理生命周期">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>Glide看点（二）巧用Fragment管理生命周期 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            Glide看点（二）巧用Fragment管理生命周期
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-15
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/Android, Glide/" rel="tag">
+                  Android, Glide
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h1 id="Motivation-动机"><a href="#Motivation-动机" class="headerlink" title="Motivation/动机"></a>Motivation/动机</h1><p>图片的一般是异步的，异步经常面临的问题是内存泄露和异步加载回来view已经销毁导致的空指针问题。而Glide在使用的时候只要求传入当前加载的view或者context，且没有用setLifeCyclelistener什么的方法就实现了生命周期的管理，它是如何做到的呢？</p>
+<h1 id="Fragment-Trick"><a href="#Fragment-Trick" class="headerlink" title="Fragment Trick"></a>Fragment Trick</h1><p>我们知道Fragment和View最大区别其实就是多了生命周期，Glide采用的是用创建一个空白Fragment来实现生命周期的管理和监听的。这是如何实现的我们一步步看代码：</p>
+<h2 id="Step-1：根据传入的Context得到FragmentManager"><a href="#Step-1：根据传入的Context得到FragmentManager" class="headerlink" title="Step 1：根据传入的Context得到FragmentManager"></a>Step 1：根据传入的Context得到FragmentManager</h2><p>Glide.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@NonNull</span><br><span class="line"> public static RequestManager with(@NonNull Context context) &#123;</span><br><span class="line">   return getRetriever(context).get(context);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>获取到正确的Context<br>com/bumptech/glide/manager/RequestManagerRetriever.java</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@NonNull</span><br><span class="line">public RequestManager get(@NonNull Context context) &#123;</span><br><span class="line">  if (context == null) &#123;</span><br><span class="line">    throw new IllegalArgumentException(&quot;You cannot start a load on a null Context&quot;);</span><br><span class="line">  &#125; else if (Util.isOnMainThread() &amp;&amp; !(context instanceof Application)) &#123;</span><br><span class="line">    if (context instanceof FragmentActivity) &#123;</span><br><span class="line">      return get((FragmentActivity) context);</span><br><span class="line">    &#125; else if (context instanceof Activity) &#123;</span><br><span class="line">      return get((Activity) context);</span><br><span class="line">    &#125; else if (context instanceof ContextWrapper) &#123;</span><br><span class="line">      return get(((ContextWrapper) context).getBaseContext());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  return getApplicationManager(context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据Context获取到FragmentManager</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">@NonNull</span><br><span class="line">  public RequestManager get(@NonNull FragmentActivity activity) &#123;</span><br><span class="line">    if (Util.isOnBackgroundThread()) &#123;</span><br><span class="line">      return get(activity.getApplicationContext());</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      assertNotDestroyed(activity);</span><br><span class="line">      FragmentManager fm = activity.getSupportFragmentManager();</span><br><span class="line">      return supportFragmentGet(activity, fm, null /*parentHint*/);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Step-2：RequestManagerFragment里注册Callback"><a href="#Step-2：RequestManagerFragment里注册Callback" class="headerlink" title="Step 2：RequestManagerFragment里注册Callback"></a>Step 2：RequestManagerFragment里注册Callback</h3><p>获取SupportRequestManagerFragment，这个就是监听生命周期的主角Fragment了。下面去看看SupportRequestManagerFragment里有什么吧</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@NonNull</span><br><span class="line">private RequestManager supportFragmentGet(@NonNull Context context, @NonNull FragmentManager fm,</span><br><span class="line">    @Nullable Fragment parentHint) &#123;</span><br><span class="line">  SupportRequestManagerFragment current = getSupportRequestManagerFragment(fm, parentHint);</span><br><span class="line">  RequestManager requestManager = current.getRequestManager();</span><br><span class="line"> // 省略..部分</span><br><span class="line">  return requestManager;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实里面就是一个持有ActivityFragmentLifecycle和RequestManager的空白Fragment。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public class SupportRequestManagerFragment extends Fragment &#123;</span><br><span class="line">  private static final String TAG = &quot;SupportRMFragment&quot;;</span><br><span class="line">  private final ActivityFragmentLifecycle lifecycle;</span><br><span class="line">  @Nullable private RequestManager requestManager;</span><br><span class="line">  </span><br><span class="line">  // ..省略..</span><br><span class="line">  @Override</span><br><span class="line">  public void onStart() &#123;</span><br><span class="line">    super.onStart();</span><br><span class="line">    lifecycle.onStart();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void onStop() &#123;</span><br><span class="line">    super.onStop();</span><br><span class="line">    lifecycle.onStop();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void onDestroy() &#123;</span><br><span class="line">    super.onDestroy();</span><br><span class="line">    lifecycle.onDestroy();</span><br><span class="line">    unregisterFragmentWithRoot();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>RequestManager里又实现了ActivityFragmentLifecycle从而可以根据什么周期对请求做一些处理<br>如：在RequestManager里的onDestroy回调里取消所有图片加载请求，销毁监听器<br>com.bumptech.glide.RequestManager</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void onDestroy() &#123;</span><br><span class="line">  targetTracker.onDestroy();</span><br><span class="line">  for (Target&lt;?&gt; target : targetTracker.getAll()) &#123;</span><br><span class="line">    clear(target);</span><br><span class="line">  &#125;</span><br><span class="line">  targetTracker.clear();</span><br><span class="line">  requestTracker.clearRequests();</span><br><span class="line">  lifecycle.removeListener(this);</span><br><span class="line">  lifecycle.removeListener(connectivityMonitor);</span><br><span class="line">  mainHandler.removeCallbacks(addSelfToLifecycle);</span><br><span class="line">  glide.unregisterRequestManager(this);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Bouns拓展"><a href="#Bouns拓展" class="headerlink" title="Bouns拓展"></a>Bouns拓展</h2><p>空白Fragment还有什么其他妙用呢？</p>
+<ul>
+<li>动态申请权限。对于不是必要的权限不同意就退出App是非常糟糕的用户体验，最佳实践应该是当要用到该权限的时候再向用户申请。这样写面临的问题就会是授权代码会散落在各个地方，这样显然是很糟糕的。所以用一个空白的Fragment，把权限检查和申请逻辑全部丢到里面，在需要用到地方只要持有这个Fragment做一下检查就好。<br>如：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line">public class CameraMicPermissionHelper extends Fragment &#123;</span><br><span class="line">  private static final int REQUEST_CAMERA_MIC_PERMISSIONS = 10;</span><br><span class="line">  public static final String TAG = &quot;CamMicPerm&quot;;</span><br><span class="line"></span><br><span class="line">  private CameraMicPermissionCallback mCallback;</span><br><span class="line">  private static boolean sCameraMicPermissionDenied;</span><br><span class="line"></span><br><span class="line">  public static CameraMicPermissionHelper newInstance() &#123;</span><br><span class="line">    return new CameraMicPermissionHelper();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public CameraMicPermissionHelper() &#123;</span><br><span class="line">    // Required empty public constructor</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">    super.onCreate(savedInstanceState);</span><br><span class="line">    setRetainInstance(true);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void onAttach(Activity activity) &#123;</span><br><span class="line">    super.onAttach(activity);</span><br><span class="line">    if (activity instanceof CameraMicPermissionCallback) &#123;</span><br><span class="line">      mCallback = (CameraMicPermissionCallback) activity;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      throw new IllegalArgumentException(&quot;activity must extend BaseActivity and implement LocationHelper.LocationCallback&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void onDetach() &#123;</span><br><span class="line">    super.onDetach();</span><br><span class="line">    mCallback = null;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void checkCameraMicPermissions() &#123;</span><br><span class="line">    if (PermissionUtil.hasSelfPermission(getActivity(), new String[]&#123;Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO&#125;)) &#123;</span><br><span class="line">      mCallback.onCameraMicPermissionGranted();</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      // UNCOMMENT TO SUPPORT ANDROID M RUNTIME PERMISSIONS</span><br><span class="line">      if (!sCameraMicPermissionDenied) &#123;</span><br><span class="line">        requestPermissions(new String[]&#123;Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO&#125;, REQUEST_CAMERA_MIC_PERMISSIONS);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void setCameraMicPermissionDenied(boolean cameraMicPermissionDenied) &#123;</span><br><span class="line">    this.sCameraMicPermissionDenied = cameraMicPermissionDenied;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public static boolean isCameraMicPermissionDenied() &#123;</span><br><span class="line">    return sCameraMicPermissionDenied;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  /**</span><br><span class="line">   * Callback received when a permissions request has been completed.</span><br><span class="line">   */</span><br><span class="line">  @Override</span><br><span class="line">  public void onRequestPermissionsResult(int requestCode, String[] permissions,</span><br><span class="line">                                         int[] grantResults) &#123;</span><br><span class="line"></span><br><span class="line">    if (requestCode == REQUEST_CAMERA_MIC_PERMISSIONS) &#123;</span><br><span class="line">      if (PermissionUtil.verifyPermissions(grantResults)) &#123;</span><br><span class="line">        mCallback.onCameraMicPermissionGranted();</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        Log.i(&quot;BaseActivity&quot;, &quot;LOCATION permission was NOT granted.&quot;);</span><br><span class="line">        mCallback.onCameraMicPermissionDenied();</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      super.onRequestPermissionsResult(requestCode, permissions, grantResults);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  public interface CameraMicPermissionCallback &#123;</span><br><span class="line">    void onCameraMicPermissionGranted();</span><br><span class="line">    void onCameraMicPermissionDenied();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>不建议的hack手段：<br> 在ViewModel出现之前，有一种很hack的方式用Fragment保存数据。在设备的configurationChange的时候保存大块数据。<br>关键方法, 把Fragment设置为true后可以在configurationChange的时候不被销毁，利用这一点保存数据。现在用ViewModel显然是更好的方法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/* Control whether a fragment instance is retained across Activity re-creation (such as from a configuration change).*/</span><br><span class="line"></span><br><span class="line">setRetainInstance(boolean retain)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>声明周期的监听，现在用Android Jetpack里的 Lifecycle-Aware Components来做是一个更简单的做法。</li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a href="https://luboganev.github.io/blog/headless-fragments/" target="_blank" rel="noopener">Headless fragments</a></li>
+<li><a href="https://medium.com/@ali.muzaffar/use-headless-fragment-for-android-m-run-time-permissions-and-to-check-network-connectivity-b48615f6272d" target="_blank" rel="noopener">Use headless Fragment for Android M run-time permissions and to check network connectivity</a></li>
+</ul>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+        <div class="nav-previous">
+          <a href="/2018/12/16/pycharm远程调试/" rel="prev"><span class="meta-arraw meta-arraw-left"></span> 上一页</a>
+        </div>
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/12/vue预渲染SEO优化/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
