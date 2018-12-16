@@ -26,7 +26,7 @@ photos:
 
 1. 打开pycharm，tools-->Deployment-->Configuration
 
-![](https://ws1.sinaimg.cn/large/006tNbRwly1fy8xrz7r2oj310d0u07wh.jpg)
+![](https://ws2.sinaimg.cn/large/006tNbRwly1fy91j70qg5j310d0u07aa.jpg)
 
 2. 点击左边“+”添加远程服务器，随便起个名字，选择SFTP
 
@@ -38,7 +38,7 @@ photos:
 
 4. 配置Mappings
 
-   ![](https://ws1.sinaimg.cn/large/006tNbRwly1fy8ynlzintj30zz0u0aep.jpg)
+   ![](https://ws4.sinaimg.cn/large/006tNbRwly1fy91kbdf5bj30zz0u0acx.jpg)
 
 5. 配置Excluded Paths（可选）
 
@@ -66,15 +66,15 @@ photos:
 
 2. 选择“SSH Interpreter” --> "Existing server configuration" --> 选择刚才创建的部署配置，使用‘’Create“或者”Move“ 都OK
 
-![](https://ws2.sinaimg.cn/large/006tNbRwly1fy8zdpxfewj31hg0u0tgu.jpg)
+![](https://ws3.sinaimg.cn/large/006tNbRwly1fy91ltimv8j31hg0u0q7l.jpg)
 
 3. 点击下一步，这时会进行连接远程服务器，稍等一会，会出现以下界面，稍微配置下，点击“Finish”即可
 
-![](https://ws3.sinaimg.cn/large/006tNbRwly1fy8zl5cur0j31fs0u00y3.jpg)
+![](https://ws4.sinaimg.cn/large/006tNbRwly1fy91mjw82fj31fs0u0q6k.jpg)
 
 最后使用远程解释器,点击“OK”，返回到项目界面，等待同步完成即可
 
-![](https://ws3.sinaimg.cn/large/006tNbRwly1fy8zmqlj4mj31fi0cg0uo.jpg)
+![](https://ws4.sinaimg.cn/large/006tNbRwly1fy91nbt8ajj31fi0cg0uq.jpg)
 
 
 
@@ -88,7 +88,7 @@ photos:
 
 ![](https://ws4.sinaimg.cn/large/006tNbRwly1fy900lq1qsj30d00tgafe.jpg)
 
-![](https://ws2.sinaimg.cn/large/006tNbRwly1fy91brol9sj315a0lktco.jpg)
+![](https://ws3.sinaimg.cn/large/006tNbRwly1fy91or1mooj315a0lkq6w.jpg)
 
 2. 运行脚本代码如下，这里使用了8000的端口
 
