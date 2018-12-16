@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="pycharm远程调试">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>pycharm远程调试 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            pycharm远程调试
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-16
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/python/" rel="tag">
+                  python
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><ol>
+<li>一些bug由于本地环境和线上环境的不一致可能导致本地无法复现</li>
+<li>本地依赖和线上依赖版本不一致也可以导致一些问题</li>
+<li>有时一些bug跟数据相关，本地数据无法和线上数据一致</li>
+<li>有些三方平台会验证服务器的合法性或者异步回调结果，如微信支付，这时候本地无法测试</li>
+</ol>
+<p>如上所诉，要是有一个很方便调试远程服务器的方法，岂不美哉。通过PyCharm我们可以很方便地实现远程调试，下面详细介绍下PyCharm这个牛叉的功能。</p>
+<h2 id="添加远程部署"><a href="#添加远程部署" class="headerlink" title="添加远程部署"></a>添加远程部署</h2><ol>
+<li>打开pycharm，tools-&gt;Deployment-&gt;Configuration, 在左边栏点“+“号添加远程服务器。</li>
+</ol>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fy8xrz7r2oj310d0u07wh.jpg" alt=""></p>
+<ol start="2">
+<li>点击左边“+”添加远程服务器，随便起个名字，选择SFTP</li>
+</ol>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy8zol12boj315g0p2tab.jpg" alt=""></p>
+<ol start="3">
+<li>配置connection</li>
+</ol>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fy8yhdwo9jj310t0u0ah8.jpg" alt=""></p>
+<ol start="4">
+<li><p>配置Mappings</p>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fy8ynlzintj30zz0u0aep.jpg" alt=""></p>
+</li>
+<li><p>配置Excluded Paths（可选）</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy8yrh6qtwj31720sc40w.jpg" alt=""></p>
+</li>
+</ol>
+<p>最后点击OK即可</p>
+<p>再次打开部署选项，可以发现现在可以直接部署代码到服务器了，也可以直接下载带代码到本地，同时自动上传（Automatic Upload）是默认勾选的，我一般会把它去掉，防止一些本地测试代码上传上去</p>
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy8yw6bdovj313r0u07wh.jpg" alt=""></p>
+<p>新增一个文件，查看deployment 选项，这时候就可以上传到远程服务器了</p>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy8z53cccrj31by0msjyp.jpg" alt=""></p>
+<h2 id="远程解释器"><a href="#远程解释器" class="headerlink" title="远程解释器"></a>远程解释器</h2><p>远程部署仅仅只是同步和拷贝文件，要真正远程调试还需要配置远程解释器</p>
+<ol>
+<li>设置页面找到“Project Interpreter” –&gt; 设置–&gt;Add</li>
+</ol>
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy8zb2ooqoj31kw0u0ws6.jpg" alt=""></p>
+<ol start="2">
+<li>选择“SSH Interpreter” –&gt; “Existing server configuration” –&gt; 选择刚才创建的部署配置，使用‘’Create“或者”Move“ 都OK</li>
+</ol>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy8zdpxfewj31hg0u0tgu.jpg" alt=""></p>
+<ol start="3">
+<li>点击下一步，这时会进行连接远程服务器，稍等一会，会出现以下界面，稍微配置下，点击“Finish”即可</li>
+</ol>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy8zl5cur0j31fs0u00y3.jpg" alt=""></p>
+<p>最后使用远程解释器,点击“OK”，返回到项目界面，等待同步完成即可</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy8zmqlj4mj31fi0cg0uo.jpg" alt=""></p>
+<h2 id="远程调试"><a href="#远程调试" class="headerlink" title="远程调试"></a>远程调试</h2><blockquote>
+<p>这里根据自己的具体项目情况而定，我这里是<strong>Flask+阿里云+nginx+运行脚本</strong>的一个例子</p>
+</blockquote>
+<ol>
+<li>新增一个 run configuration</li>
+</ol>
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fy8zxkrmqmj30bm06amyi.jpg" alt=""></p>
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy900lq1qsj30d00tgafe.jpg" alt=""></p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy901qpar0j315a0lkwh7.jpg" alt=""></p>
+<ol start="2">
+<li>运行脚本代码如下，这里使用了8000的端口</li>
+</ol>
+<blockquote>
+<p><strong>Host要配置为0.0.0.0</strong></p>
+</blockquote>
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fy904q9vcyj30pc03g74i.jpg" alt=""></p>
+<ol start="3">
+<li>nginx 配置8000 端口</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">  server &#123;</span><br><span class="line">      listen       8000 ;</span><br><span class="line">      listen       [::]:8000 ;</span><br><span class="line">      server_name  _;</span><br><span class="line">      root         /usr/share/nginx/html;</span><br><span class="line">      access_log  /var/log/nginx/access_8000.log  main;</span><br><span class="line">      error_log  /var/log/nginx/error_8000.log;</span><br><span class="line"></span><br><span class="line">      # Load configuration files for the default server block.</span><br><span class="line">      include /etc/nginx/default.d/*.conf;</span><br><span class="line">      location / &#123;</span><br><span class="line">proxy_pass http://127.0.0.1:8000;</span><br><span class="line">proxy_set_header Host $host;</span><br><span class="line">proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      error_page 404 /404.html;</span><br><span class="line">          location = /40x.html &#123;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      error_page 500 502 503 504 /50x.html;</span><br><span class="line">          location = /50x.html &#123;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>要是使用阿里云，还需要安全组开放8000 端</li>
+<li>断点运行</li>
+</ol>
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fy90aeah0dj30e0048glz.jpg" alt=""></p>
+<p><img src="/Users/apple/Library/Application Support/typora-user-images/image-20181216233413216.png" alt="image-20181216233413216"></p>
+<ol start="6">
+<li>出现上图所示的时候，恭喜你，你已经可以断点调试远程服务器了</li>
+</ol>
+<p>我们打一个断点，然后试着访问一个API服务：<a href="http://xx.xx.xx.xx:8000/api/pages/bookstore" target="_blank" rel="noopener">http://xx.xx.xx.xx:8000/api/pages/bookstore</a></p>
+<p>完美断上</p>
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fy90trr9yij318s0u0n2c.jpg" alt=""></p>
+<h3 id="补充说明"><a href="#补充说明" class="headerlink" title="补充说明"></a>补充说明</h3><p>不建议在正式服务器使用这个功能，可以在测试服务器使用</p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/15/Glide看点（二）巧用Fragment管理生命周期/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>

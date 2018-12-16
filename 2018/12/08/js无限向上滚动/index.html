@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="js无限向上滚动">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>js无限向上滚动 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            js无限向上滚动
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-08
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/js/" rel="tag">
+                  js
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>需要做一个无限列表数据向上滚动的小需求。在页面插入大量dom 可能会造成页面的卡顿。页面用户体验效果不友好等问题</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><ol>
+<li>在页面插入两个父级dom 作为数据展示</li>
+<li>使用setInterval周期函数判断dom是否移动出展示区域</li>
+<li>dom移出展示区域将dom移除，重新插入到展示元素尾部</li>
+<li>dom未移出展示区域，让展示区域滚动条向下滚动</li>
+</ol>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"> //数据展示区域</span><br><span class="line">  &lt;div class=&quot;list-content&quot; id=&quot;demo&quot;&gt;</span><br><span class="line">   &lt;/div&gt;</span><br><span class="line"> &lt;script&gt;</span><br><span class="line"> //目前假数据</span><br><span class="line"> //设置定</span><br><span class="line"> var arr = []</span><br><span class="line"> for (var i = 0; i &lt; 100; i++) &#123;</span><br><span class="line">    var item = &#123;</span><br><span class="line">         id: i,</span><br><span class="line">         content: &quot;恭喜&quot; + i + &quot;获得的了&quot; + i + &quot;元&quot;</span><br><span class="line">       &#125;</span><br><span class="line">       arr.push(item)</span><br><span class="line"> &#125;</span><br><span class="line"> LoadMord(&quot;#demo&quot;, arr, 50, 6) </span><br><span class="line">function LoadMord(str, arr, speed, len) &#123;</span><br><span class="line">       var s = speed || 50;    //滚动速度值，值越大速度越慢</span><br><span class="line">       var a = arr || [];</span><br><span class="line">       var l = len || 6;</span><br><span class="line">       //插入dom</span><br><span class="line">       var oDiv1 = $(&quot;&lt;div id=&apos;demo1&apos;&gt;&lt;/div&gt;&quot;)</span><br><span class="line">       var oDiv2 = $(&quot;&lt;div id=&apos;demo2&apos;&gt;&lt;/div&gt;&quot;)</span><br><span class="line">       var oDiv3 = $(&quot;&lt;div id=&apos;demo3&apos;&gt;&lt;/div&gt;&quot;)</span><br><span class="line">       for (var i = 0; i &lt; l; i++) &#123;</span><br><span class="line">           var p = $(&quot;&lt;p&gt;&quot; + a[i].content + &quot;&lt;/p&gt;&quot;)</span><br><span class="line">           p.appendTo(oDiv1)</span><br><span class="line">       &#125;</span><br><span class="line">       for (var i = 0; i &lt; l; i++) &#123;</span><br><span class="line">           var p = $(&quot;&lt;p&gt;&quot; + a[l + i].content + &quot;&lt;/p&gt;&quot;)</span><br><span class="line">           p.appendTo(oDiv2)</span><br><span class="line">       &#125;</span><br><span class="line">       oDiv1.appendTo($(str))</span><br><span class="line">       oDiv2.appendTo($(str))</span><br><span class="line">       var flag = 2</span><br><span class="line">       function Marquee() &#123;</span><br><span class="line">           if ($(&quot;#demo1&quot;).position().top + $(&quot;#demo1&quot;)[0].offsetHeight == 0 || $(&quot;#demo2&quot;).position().top + $(&quot;#demo2&quot;)[0].offsetHeight == 0) &#123;</span><br><span class="line">               oDiv3.html(&quot;&quot;)</span><br><span class="line">               for (var i = 0; i &lt; l; i++) &#123;</span><br><span class="line">                   if (l * flag + i &gt; a.length - 1) &#123;</span><br><span class="line">                       var p = $(&quot;&lt;p&gt;&lt;/p&gt;&quot;)</span><br><span class="line">                   &#125; else &#123;</span><br><span class="line">                       var p = $(&quot;&lt;p&gt;&quot; + arr[l * flag + i].content + &quot;&lt;/p&gt;&quot;)</span><br><span class="line">                   &#125;</span><br><span class="line">                   p.appendTo(oDiv3)</span><br><span class="line">               &#125;</span><br><span class="line">               flag++</span><br><span class="line">               if (oDiv3.html().length == 0) &#123;</span><br><span class="line">                   clearInterval(MyMar)</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">           if ($(&quot;#demo1&quot;).position().top + $(&quot;#demo1&quot;)[0].offsetHeight == 0) &#123;</span><br><span class="line">               oDiv1.remove()</span><br><span class="line">               oDiv1.html(oDiv3.html())</span><br><span class="line">               oDiv1.appendTo($(str))</span><br><span class="line">           &#125; else if ($(&quot;#demo2&quot;).position().top + $(&quot;#demo2&quot;)[0].offsetHeight == 0) &#123;</span><br><span class="line">               oDiv2.remove()</span><br><span class="line">               oDiv2.html(oDiv3.html())</span><br><span class="line">               oDiv2.appendTo($(str))</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">           demo.scrollTop++</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       var MyMar = setInterval(Marquee, s);</span><br><span class="line">   &#125;</span><br><span class="line">   &lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="问题总结"><a href="#问题总结" class="headerlink" title="问题总结"></a>问题总结</h2><ul>
+<li>使用dom的offsetHeight和jquery.position()判断dom 是否移出展示区域<br>未指定 offsetParent 导致获取到的 jquery.position().top 不准确</li>
+<li>dom 的scrollTop ++ 展示区域的dom向上滚动</li>
+</ul>
+<h2 id="搞清属性"><a href="#搞清属性" class="headerlink" title="搞清属性"></a>搞清属性</h2><h3 id="关于offset"><a href="#关于offset" class="headerlink" title="关于offset"></a>关于offset</h3><ol>
+<li>offsetParent</li>
+<li>offsetTop    </li>
+<li>offsetLeft</li>
+<li>offsetWidth  </li>
+<li>offsetHeight</li>
+</ol>
+<p>其中offsetWidth与offsetHeight有个特点，就是这两个属性的值只与该元素有关，与周围元素（父级和子级元素无关）。然而，offsetLeft与offsetTop却不是这样，这两个属性与offsetParent有关。</p>
+<p><code>offsetParent</code> 如果当前元素的父级元素没有进行CSS定位（position为absolute或relative），offsetParent为body。如果当前元素的父级元素中有CSS定位（position为absolute或relative），offsetParent取最近的那个父级元素。</p>
+<p><code>offsetLeft</code>   等于(offsetParent的padding-left)+(中间元素的offsetWidth)+(当前元素的margin-left)。</p>
+<p><code>offsetTop</code>    等于(offsetParent的padding-top)+(中间元素的offsetHeight)+(当前元素的margin-top)。</p>
+<p><code>offsetWidth</code>  等于(border-width)*2+(padding-left)+(width)+(padding-right)</p>
+<p><code>offsetHeight</code> 等于(border-width)*2+(padding-top)+(height)+(padding-bottom)</p>
+<p><code>jquery.position()</code> 同样也是需要根据offsetParent获取值返回。获取匹配元素相对父元素的偏移。返回的对象包含两个整形属性：top 和 left。为精确计算结果，请在补白、边框和填充属性上使用像素单位。此方法只对可见元素有效。  </p>
+<h3 id="滚动轴"><a href="#滚动轴" class="headerlink" title="滚动轴"></a>滚动轴</h3><p><code>scrollHeight</code>和 <code>scrollWidth</code>，可滚动的绝对宽高，包括隐藏不可见的部分（offset仅是相对于元素的width和height不包括隐藏部分）。<br><code>scrollTop</code>和<code>scrollLeft</code>: 可滑动的元素（即元素出现滚动条的情况时）内部在xy轴上滑动的距离，可为其赋值。</p>
+<h3 id="元素本身"><a href="#元素本身" class="headerlink" title="元素本身"></a>元素本身</h3><p><code>clientHeight</code>和<code>clientWidth</code>：可视区域的宽高（不同浏览器中clientHeight和offsetWidth有区别）。<br><code>clientTop</code>和<code>clientLeft</code>:表示内容区域的左，上角相对于整个元素左，上角的位置（包括边框）</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://www.zhangxinxu.com/wordpress/2011/09/cssom%E8%A7%86%E5%9B%BE%E6%A8%A1%E5%BC%8Fcssom-view-module%E7%9B%B8%E5%85%B3%E6%95%B4%E7%90%86%E4%B8%8E%E4%BB%8B%E7%BB%8D/" target="_blank" rel="noopener">CSSOM视图模式(CSSOM View Module)相关整理</a></p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+        <div class="nav-previous">
+          <a href="/2018/12/09/APK-文件分析/" rel="prev"><span class="meta-arraw meta-arraw-left"></span> 上一页</a>
+        </div>
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/02/python循环之操作数据源/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
