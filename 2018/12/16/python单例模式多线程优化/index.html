@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="单例模式多线程优化">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>单例模式多线程优化 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            单例模式多线程优化
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-16
+          </p>
+          <div class="tags-links">
+            
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h1 id="单例模式（singleton-Pattern）"><a href="#单例模式（singleton-Pattern）" class="headerlink" title="单例模式（singleton Pattern）"></a>单例模式（singleton Pattern）</h1><h4 id="定义："><a href="#定义：" class="headerlink" title="定义："></a>定义：</h4><p>顾名思义，在程序的生命周期中只有一个该类的对象</p>
+<h3 id="首先回顾下之前语言中的单例模式优化"><a href="#首先回顾下之前语言中的单例模式优化" class="headerlink" title="首先回顾下之前语言中的单例模式优化"></a>首先回顾下之前语言中的单例模式优化</h3><p>简单的声明方式:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public sealed class Singleton</span><br><span class="line">&#123;</span><br><span class="line">static Singleton instance=null;</span><br><span class="line">Singleton()</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Singleton Instance</span><br><span class="line">&#123;</span><br><span class="line">get</span><br><span class="line">&#123;</span><br><span class="line">if(instance ==null)</span><br><span class="line">&#123;</span><br><span class="line">  instance =new Singleton();</span><br><span class="line">&#125;</span><br><span class="line">return instance;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="singleton-Pattern-的优点："><a href="#singleton-Pattern-的优点：" class="headerlink" title="singleton Pattern  的优点："></a>singleton Pattern  的优点：</h4><ul>
+<li>直到类想要产生一个实例时才会初始化，被叫做“惰性实例化”，避免了程序初始化时生成没必要的实例；</li>
+<li>类的实例化放在属性内部，这样可以有一些附加功能（例如对子类的实例化）；</li>
+</ul>
+<h4 id="单例模式简单声明的弊端："><a href="#单例模式简单声明的弊端：" class="headerlink" title="单例模式简单声明的弊端："></a>单例模式简单声明的弊端：</h4><p>（多线程访问Instance属性要求实例化情况下会产生多个实例，违背了设计模式的用意）</p>
+<h4 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">public sealed class Singleton</span><br><span class="line">&#123;</span><br><span class="line">static readonly object auxiliaryLock=new object();//进程辅助对象</span><br><span class="line">static Singleton instance=null;</span><br><span class="line">Singleton()</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Singleton Instance</span><br><span class="line">&#123;</span><br><span class="line">get</span><br><span class="line">&#123;</span><br><span class="line">lock(auxiliaryLock )//加了锁的这部分代码只有一个线程可以访问</span><br><span class="line">&#123;</span><br><span class="line">if(instance ==null)</span><br><span class="line">&#123;</span><br><span class="line">  instance =new Singleton();</span><br><span class="line">&#125;</span><br><span class="line">return instance;</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样做避免了多线程触发问题，但存在一个问题每次访问Instance时不管instance是否为null都会加锁独占影响性能 </p>
+<p>进一步改进 </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public sealed <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span></span></span><br><span class="line">&#123;</span><br><span class="line">static readonly object auxiliaryLock=new object();//进程辅助对象</span><br><span class="line">static Singleton instance=null;</span><br><span class="line">Singleton()</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public static Singleton Instance</span><br><span class="line">&#123;</span><br><span class="line">get</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">if</span>(instance ==null )//加了这个判断就可以排除已经有该实例的没必要的加锁操作</span><br><span class="line">&#123;</span><br><span class="line">lock(auxiliaryLock )//加了锁的这部分代码只有一个线程可以访问</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">if</span>(instance ==null)</span><br><span class="line">&#123;</span><br><span class="line">  instance =new Singleton();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> instance;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种方式仍然有很多缺点：无法实现延迟初始化。</p>
+<p>进一步改进：静态初始化</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">public sealed class Singleton</span><br><span class="line">&#123;</span><br><span class="line">static readonly Singleton instance=new Singleton();</span><br><span class="line">static Singleton()</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">Singleton()</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">public static Singleton Instance</span><br><span class="line">&#123;</span><br><span class="line">get</span><br><span class="line">&#123;</span><br><span class="line">return instance;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="python中优化"><a href="#python中优化" class="headerlink" title="python中优化"></a>python中优化</h3><h4 id="首先还是通过最熟悉的类的形式创建"><a href="#首先还是通过最熟悉的类的形式创建" class="headerlink" title="首先还是通过最熟悉的类的形式创建"></a>首先还是通过最熟悉的类的形式创建</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Singleton(object):</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        import time</span><br><span class="line">        time.sleep(2)#模拟执行IO操作</span><br><span class="line"></span><br><span class="line">    @classmethod</span><br><span class="line">    def instance(cls, *args, **kwargs):</span><br><span class="line">        if not hasattr(Singleton, &quot;_instance&quot;):</span><br><span class="line">            Singleton._instance = Singleton(*args, **kwargs)</span><br><span class="line">        return Singleton._instance</span><br></pre></td></tr></table></figure>
+<h4 id="和上面一样还是来测试下多线程情况下会发生什么"><a href="#和上面一样还是来测试下多线程情况下会发生什么" class="headerlink" title="和上面一样还是来测试下多线程情况下会发生什么"></a>和上面一样还是来测试下多线程情况下会发生什么</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">import threading</span><br><span class="line"></span><br><span class="line">def task(arg):</span><br><span class="line">    obj = Singleton.instance()</span><br><span class="line">    print(obj)</span><br><span class="line"></span><br><span class="line">for i in range(10):</span><br><span class="line">    t = threading.Thread(target=task,args=[i,])</span><br><span class="line">    t.start()</span><br></pre></td></tr></table></figure>
+<p>改进</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import time</span><br><span class="line">import threading</span><br><span class="line">class Singleton(object):</span><br><span class="line">    _instance_lock = threading.Lock()</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        time.sleep(2)</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">    @classmethod</span><br><span class="line">    def instance(cls, *args, **kwargs):</span><br><span class="line">        if not hasattr(Singleton, &quot;_instance&quot;):#选择性加锁</span><br><span class="line">            with Singleton._instance_lock:</span><br><span class="line">                if not hasattr(Singleton, &quot;_instance&quot;):</span><br><span class="line">                    Singleton._instance = Singleton(*args, **kwargs)</span><br><span class="line">        return Singleton._instance</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def task(arg):</span><br><span class="line">    obj = Singleton.instance()</span><br><span class="line">    print(obj)</span><br><span class="line">for i in range(10):</span><br><span class="line">    t = threading.Thread(target=task,args=[i,])</span><br><span class="line">    t.start()</span><br><span class="line">time.sleep(20)</span><br><span class="line">obj = Singleton.instance()</span><br><span class="line">print(obj)</span><br></pre></td></tr></table></figure>
+<p>现在则是可以多线程可以调用的单例，实例化方式Singleton.instance()</p>
+<h4 id="能不能像正常类一样初始化呢，不想区别对待"><a href="#能不能像正常类一样初始化呢，不想区别对待" class="headerlink" title="能不能像正常类一样初始化呢，不想区别对待"></a>能不能像正常类一样初始化呢，不想区别对待</h4><p>python中一个对象的创建过程是先执行“<strong>new</strong>“方法然后执行”<strong>init</strong>“方法，我们创建单例的过程可以放到new中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import threading</span><br><span class="line">class Singleton(object):</span><br><span class="line">    _instance_lock = threading.Lock()</span><br><span class="line"></span><br><span class="line">    def __init__(self):</span><br><span class="line">        time.sleep(2)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    def __new__(cls, *args, **kwargs):</span><br><span class="line">        if not hasattr(Singleton, &quot;_instance&quot;):</span><br><span class="line">            with Singleton._instance_lock:</span><br><span class="line">                if not hasattr(Singleton, &quot;_instance&quot;):</span><br><span class="line">                    Singleton._instance = object.__new__(cls)  </span><br><span class="line">        return Singleton._instance</span><br></pre></td></tr></table></figure>
+<p>这样则可以像实例化正常类一样来实例化单例Singleton()</p>
+<p>python提供metaclass（元类）方便对类的动态操作，很多静态语言中也有通过反射获取类的类型例如C#中的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">typeof(Int32)</span><br><span class="line">i.GetType()</span><br></pre></td></tr></table></figure>
+<p>那么使用元类实现的单例模式岂不更加合适</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">import threading</span><br><span class="line"></span><br><span class="line">class SingletonType(type):</span><br><span class="line">    _instance_lock = threading.Lock()</span><br><span class="line">    def __call__(cls, *args, **kwargs):</span><br><span class="line">        if not hasattr(cls, &quot;_instance&quot;):</span><br><span class="line">            with SingletonType._instance_lock:</span><br><span class="line">                if not hasattr(cls, &quot;_instance&quot;):</span><br><span class="line">                    cls._instance = super(SingletonType,cls).__call__(*args, **kwargs)</span><br><span class="line">        return cls._instance</span><br><span class="line"></span><br><span class="line">class Singleton(metaclass=SingletonType):</span><br><span class="line">    def __init__(self,name):</span><br><span class="line">        self.name = name</span><br></pre></td></tr></table></figure>
+<p>调用则是Singleton(‘only’)</p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+        <div class="nav-previous">
+          <a href="/2018/12/16/pycharm远程调试/" rel="prev"><span class="meta-arraw meta-arraw-left"></span> 上一页</a>
+        </div>
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/15/Glide看点（二）巧用Fragment管理生命周期/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
