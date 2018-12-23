@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="Kotlin coroutine（一）异步回调的故事">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>Kotlin coroutine（一）异步回调的故事 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            Kotlin coroutine（一）异步回调的故事
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-15
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/Android, kotlin/" rel="tag">
+                  Android, kotlin
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h2 id="Part-1-Motivation"><a href="#Part-1-Motivation" class="headerlink" title="Part 1, Motivation"></a>Part 1, Motivation</h2><p>在前端的世界里，为了保证UI的流畅性，耗时的操作都应该丢到异步任务里去。但是传统的异步回调却在实际工程里带来巨大的麻烦。</p>
+<pre><code>* 当多个异步任务需要组合执行的时候，嵌套起来可读性，维护性很差 （ *Callback Hell 回调地狱* ）
+* 界面销毁时，异步任务结束后的回调要进行判断，不然会造成异常
+</code></pre><p>下面一个例子展示一个常见的开发场景下的问题：<br>同步用户书架，并获取最新章节标志，流程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">* 从数据库查询用户的本地数据</span><br><span class="line">* 从服务器拉取用户云端备份数据</span><br><span class="line">* 两份数据去重合并</span><br><span class="line">* 更具合并后的数据请求服务端拉取最新章节信息</span><br></pre></td></tr></table></figure>
+<p>传统异步回调式写法：<br><img src="https://lh3.googleusercontent.com/-B5W1pTTBp6A/XAJhjDkI3QI/AAAAAAAAXY8/yRT7LxcpR-0-Ofj1QJtMdGoKLLWYy1uYgCHMYCw/I/15436514890844.jpg" alt=""></p>
+<p>这样的代码异常难读且非常容易出bug<br>但是如果代码可以改为类似如下的代码呢? 瞬间可读性，强了数倍。</p>
+<pre><code>val localData = fetchUserBookFromDB()
+val remoteData = fetchUserBookFromRemote()
+val mergeData = mergeData(localData)
+val result = fetchBookUpdate(mergeData)
+</code></pre><h2 id="Part-2-异步问题的改进史"><a href="#Part-2-异步问题的改进史" class="headerlink" title="Part 2, 异步问题的改进史"></a>Part 2, 异步问题的改进史</h2><h3 id="Future-Promise-RxJava"><a href="#Future-Promise-RxJava" class="headerlink" title="Future/Promise/RxJava"></a>Future/Promise/RxJava</h3><p>如果每个异步函数都要传递一个callback，来处理问题很容易造成嵌套的结构，那有没有办法回调扁平化处理呢？更具这样的思路，于是就产生了promise和Future。<br>其实他们都是相当于封装了一个统一的类作为回调把回调从参数列表里移除并做为返回值包装了起来，就可以用来进行链式调用。<br>Before:</p>
+<pre><code>fun requestSomethingAsync(callback: Callabck&lt;Data&gt;)
+
+requestSomethingAsync(object: Callback {
+    override onSuccess() {
+        doAnotherThingAsync(...)
+    }
+    override onFailed() {
+    }
+})
+</code></pre><p>After:</p>
+<pre><code>fun requestSomethingAsync():Promise&lt;Data&gt; {}
+
+requestSomethingAsync()
+   .then(res -&gt; {})
+   .catch(err -&gt; {})
+</code></pre><h3 id="async-await"><a href="#async-await" class="headerlink" title="async/await"></a>async/await</h3><p>链式调用虽然解决了层级嵌套的问题，但是仍然不是很优雅（想想RxJava那么多种操作符）。与是有了async和await关键字的概念，它可以把异步任务改为同步的方法进行编写。</p>
+<pre><code>suspend fun fetchBookUpdateInfo() {
+    val localData = fetchUserBookFromDB().await()
+    val remoteData = fetchUserBookFromRemote().await()
+    val mergeData = mergeData(localData).await()
+    val result = fetchBookUpdate(mergeData).await()
+}
+</code></pre><h2 id="Part-3-Kotlin-coroutine基本概念"><a href="#Part-3-Kotlin-coroutine基本概念" class="headerlink" title="Part 3, Kotlin coroutine基本概念"></a>Part 3, Kotlin coroutine基本概念</h2><h3 id="coroutine-Builder"><a href="#coroutine-Builder" class="headerlink" title="coroutine Builder"></a>coroutine Builder</h3><p>如字面上的意思，这写类提供创建coroutine的方式<br>launch, async, runningBlock 等等</p>
+<ul>
+<li>launch： 按coroutine作者Roman Elizarov说的那样，就像调用new Thread开启一个新的线程做任务，属于Fire and Forget（用完就走，即不用操心任务结果成功失败的那种）<br><img src="https://lh3.googleusercontent.com/-rLe_-FttLlk/XAJhje5L4EI/AAAAAAAAXZA/VD2qdSEF_1kOQgEB6N9wf4hlzjf8DpT6ACHMYCw/I/15436567921769.jpg" alt=""><br>它会立即返回一个Job，Job里拥有如下这样类似Thread的方法。<br><img src="https://lh3.googleusercontent.com/-EAQGb2nCql0/XAJhjobs0EI/AAAAAAAAXZE/YzmKFHbuiTsfge-4g__fY8OF95TgnJ_TwCHMYCw/I/15436568390391.jpg" alt=""></li>
+<li>async： 返回的是Deferred,Deferred继承与Job，比一般Job多的是</li>
+</ul>
+<p>下面是一个栗子：<br><img src="https://lh3.googleusercontent.com/-ZqSO_O5AhEQ/XAJhj6gdwNI/AAAAAAAAXZI/oxonltVPUVIyF45EjLIubKtItmgGAQLXgCHMYCw/I/15436584851861.jpg" alt=""></p>
+<h3 id="coroutine-context"><a href="#coroutine-context" class="headerlink" title="coroutine context"></a>coroutine context</h3><p>coroutine里运行的上下文。规定运行使用的环境是什么。这里和RxJava里决定使用什么类型的线程池一样的概念。<br>分为Main，IO，Default，Unconfine。<br>Main就是android里的UI线程，IO是一个线程池使用与做IO操作。<br>给coroutine制定不同的context可以大幅度的简化UI和取数据的逻辑。<br>下面我改写上面的栗子：<br><img src="https://lh3.googleusercontent.com/-1U5rCf-ZnOk/XAJhkJ9hsFI/AAAAAAAAXZM/FqFcKAYVirwsLWZRKCmflZI1QgIS0S5JwCHMYCw/I/15436590604220.jpg" alt=""><br>我们在UI事件上进行对View的操作，在load数据的时候使用的IO的context来进行。</p>
+<h3 id="suspend关键字"><a href="#suspend关键字" class="headerlink" title="suspend关键字"></a>suspend关键字</h3><p>suspend可以标志这个方法会时当前运行时挂起。suspend函数只能在coroutine里运行。</p>
+<h3 id="预告"><a href="#预告" class="headerlink" title="预告"></a>预告</h3><p>改用async/await的编程形式大大简化了异步复杂的交互逻辑。并且对错误处理很友好（可以直接对catch）。下一篇将会简单介绍Coroutine背后实现的一些原理。</p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/15/Glide看点（一）-图片PreScale/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2018</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
