@@ -1,3 +1,11 @@
+---
+title: Glide看点（三）内存管理
+date: 2018-12-23 15:25:46
+tags: Android, Glide
+photos:
+ - https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80
+---
+
 Glide里的缓存是一个精妙的多级缓存，从文档里我们可以知道总的缓存策略如下：
 > 默认情况下，Glide 会在开始一个新的图片请求之前检查以下多级的缓存：
 
