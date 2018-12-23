@@ -1,10 +1,3 @@
----
-title: Glide看点(三) 内存管理
-date: 2018-12-23 15:25:46
-tags: Android, Glide
-photos:
- - https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1500&q=80
----
 Glide里的缓存是一个精妙的多级缓存，从文档里我们可以知道总的缓存策略如下：
 > 默认情况下，Glide 会在开始一个新的图片请求之前检查以下多级的缓存：
 
@@ -17,7 +10,7 @@ Glide里的缓存是一个精妙的多级缓存，从文档里我们可以知道
 > 如果四个步骤都未能找到图片，则Glide会返回到原始资源以取回数据（原始文件，Uri, Url等）。
 
 本文讲分析Glide对于Bitmap的内存缓存逻辑：
-## ActiveCache构建多级缓存
+## ActiveCache的使用
 Glide里有内存里分别有两层缓存，一个是Active Cache一个是普通的Cache。他们本质上都是LinkedHashMap实现的LRUCache，只是调度策略让他们拥有了不同的功能。
 
 从load方法来看策略：
@@ -86,14 +79,14 @@ private EngineResource<?> loadFromCache(Key key, boolean isMemoryCacheable) {
 
 ```
 画个数据流图看得更直观一些
- ![-w766](media/15455276505561/15455419708995.jpg)
+ ![-w766](https://lh3.googleusercontent.com/-MCF0Iy8U4zU/XB85_HGpyvI/AAAAAAAAXxE/Tm6vWU2dGUo9-cei08I3_CStVVaBxJrUwCHMYCw/I/15455419708995.jpg)
 
  
 注： resource release时机解释：每个资源有一个自己的使用计数，每当使用的时候会调用acquire方法给计数加1，每次job完成后会计数减1，当计数为零时进行release
 
 ## Object Pool的使用
 我们知道如果较短时间内频繁的新建对象是会造成内存的抖动，可能造成界面的卡顿。
-  ![-w713](media/15455276505561/15455434429422.jpg)
+  ![-w713](https://lh3.googleusercontent.com/-adg_-2ZY2s0/XB85_RujvbI/AAAAAAAAXxI/9YJPvcJ_fFApFxDpGBaDUvxKd5ho2zjdwCHMYCw/I/15455434429422.jpg)
 Object Pool就是为了避免这种情况发生的一种常见设计模式。它会初始化一些列的对象，当需要对象的时候不是去创建一个新的对象，二手去复用闲置的对象资源。当没有闲置资源的时候进行扩容。
 Glide里大量使用了Object Pool的实现。
 
@@ -116,12 +109,11 @@ sortedSizes： 记录每个Key下对应的Bitmap的数量，且已大小排序
 ### 为什么Bitmap Pool的Key是Bitmap的尺寸
 Android里默认的API每次decode bitmap或则一些对bitmap的操作时默认是新创建一张Bitmap。API 11以后提供了BitmapFactory.Options.inBitmap这个变量来告诉系统去复用原来的已经存在的bitmap而不是重新创建bitmap从而达到节省内存的目的。
 但是inBitmap的使用有一些限制，复用的bitmap的大小必须大于等于原来的尺寸。所以需要用bitmap的尺寸作为Key来缓存bitmap。
-![-w482](media/15455276505561/15455438718436.jpg)
+![-w482](https://lh3.googleusercontent.com/-BzN1rbQoWRY/XB85_2BlPnI/AAAAAAAAXxM/5HwR9_Cl_IkAmSk5ccAr5iQT_7gw67uzQCHMYCw/I/15455438718436.jpg)
 ### 其他Tips
 * 不同的BitMapConfig不能复用，所以需要用不同的Pool来缓存bitmap。这里也就是Glide里的
 com/bumptech/glide/load/engine/bitmap_recycle/SizeConfigStrategy.java 存在的意义
-
-![-w465](media/15455276505561/15455439182865.jpg)
+![-w465](https://lh3.googleusercontent.com/-rwxU4r4ksws/XB86AXKLzwI/AAAAAAAAXxQ/5mBtmKvaG_MN2ok2MOxtzt97dj3cweDnwCHMYCw/I/15455439182865.jpg)
 
 ## 总结
 * 从Glide里我们可以学习到如何用LruCache建立多级缓存的逻辑。
@@ -130,6 +122,4 @@ com/bumptech/glide/load/engine/bitmap_recycle/SizeConfigStrategy.java 存在的�
 ## 参考
 [Glide v4 Caching](https://muyangmin.github.io/glide-docs-cn/doc/caching.html)
 [Re-using Bitmaps](https://www.youtube.com/watch?v=_ioFW3cyRV0)
-
-
 
