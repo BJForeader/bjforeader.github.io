@@ -523,10 +523,10 @@ Content
   position: relative; }
 
 .container {
-  max-width: 750px;
+  max-width: 600px;
   margin: 0 auto;
-  padding-left: 30px;
-  padding-right: 30px; }
+  padding-left: 50px;
+  padding-right: 50px; }
 
 .inside-wrapper {
   max-width: 920px;
@@ -536,10 +536,7 @@ Content
 .attachment-post-thumbnail {
   margin: 0 auto 35px;
   transition: opacity 0.7s;
-  display: block;
-  max-height: 400px;
-  object-fit: cover;
-  overflow: hidden; }
+  display: block; }
   .attachment-post-thumbnail:hover {
     opacity: 0.7; }
 
@@ -568,7 +565,7 @@ Content
 .home .entry-content {
   margin: 1.5em 0; }
   .home .entry-content p {
-    text-align: justify; }
+    text-align: center; }
 
 .posted-on {
   text-align: center;
@@ -793,8 +790,8 @@ Footer
   width: 100%; }
 
 .post {
-  padding-top: 50px;
-  padding-bottom: 50px; }
+  padding-top: 70px;
+  padding-bottom: 70px; }
   .post .nav-links a {
     text-decoration: none;
     color: #3a3a3a;
