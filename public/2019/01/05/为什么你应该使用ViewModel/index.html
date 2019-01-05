@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="为什么你应该使用ViewModel">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>为什么你应该使用ViewModel - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://hexo.io/icon/favicon-96x96.png">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            为什么你应该使用ViewModel
+            
+          </h1>
+          <p class="posted-on">
+          2019-01-05
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/Android, 构架/" rel="tag">
+                  Android, 构架
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h3 id="MVP-vs-MVVM"><a href="#MVP-vs-MVVM" class="headerlink" title="MVP vs MVVM"></a>MVP vs MVVM</h3><h4 id="MVP"><a href="#MVP" class="headerlink" title="MVP"></a>MVP</h4><p>MVP代表Model–view–presenter，用图来表示MVP的思想如下：<br><img src="https://lh3.googleusercontent.com/-qCIouASXirE/XDB3kMH2Z7I/AAAAAAAAX0o/_xt_KXxew7gkfKMt2xw29H1YNJo5WMEQQCHMYCw/I/15466751424530.jpg" alt=""><br><em>图片来之wikipedia</em></p>
+<p>Presenter作为中间人，负责在View和数据Model之间处理业务逻辑。其实这里隐藏了Presenter带来的问题，Presenter的作用不单纯他需要一边与View打交道，一边与数据打交道。只能剥离一些Activity/Fragment的代码。</p>
+<p>下面已Google architecture sample里MVP的代码作为例子：<br>这是一个加载一个todo list的界面例子<br>MVP会先定义接口作为协议</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">interface TasksContract &#123;</span><br><span class="line"></span><br><span class="line">    interface View : BaseView&lt;Presenter&gt; &#123;</span><br><span class="line">        var isActive: Boolean</span><br><span class="line"></span><br><span class="line">        fun setLoadingIndicator(active: Boolean)</span><br><span class="line"></span><br><span class="line">        fun showTasks(tasks: List&lt;Task&gt;)</span><br><span class="line"></span><br><span class="line">        fun showNoTasks()</span><br><span class="line"></span><br><span class="line">        // 省略</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    interface Presenter : BasePresenter &#123;</span><br><span class="line"></span><br><span class="line">        fun loadTasks(forceUpdate: Boolean)</span><br><span class="line"></span><br><span class="line">        fun result(requestCode: Int, resultCode: Int)</span><br><span class="line"></span><br><span class="line">        // 省略</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TasksPresenter代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">class TasksPresenter(val tasksRepository: TasksRepository, val tasksView: TasksContract.View)</span><br><span class="line">    : TasksContract.Presenter &#123;</span><br><span class="line"></span><br><span class="line">       private fun loadTasks(forceUpdate: Boolean, showLoadingUI: Boolean) &#123;</span><br><span class="line">        // 这里需要知道view的状态来判断是否需要显示loading，showLoading由view传递过来。这里已经开始让逻辑不单一了</span><br><span class="line">        if (showLoadingUI) &#123;</span><br><span class="line">            tasksView.setLoadingIndicator(true)</span><br><span class="line">        &#125;</span><br><span class="line">        // 省略部分代码...</span><br><span class="line"></span><br><span class="line">        // 加载数据</span><br><span class="line">        tasksRepository.getTasks(object : TasksDataSource.LoadTasksCallback &#123;</span><br><span class="line">            override fun onTasksLoaded(tasks: List&lt;Task&gt;) &#123;</span><br><span class="line">                val tasksToShow = ArrayList&lt;Task&gt;()</span><br><span class="line"></span><br><span class="line">                // 当View不是active的时候直接返回，这里有要考虑View被销毁，回调还在的问题，代码持续ugly</span><br><span class="line">                if (!tasksView.isActive) &#123;</span><br><span class="line">                    return</span><br><span class="line">                &#125;</span><br><span class="line">                if (showLoadingUI) &#123;</span><br><span class="line">                    tasksView.setLoadingIndicator(false)</span><br><span class="line">                &#125;</span><br><span class="line">                processTasks(tasksToShow)</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            override fun onDataNotAvailable() &#123;</span><br><span class="line">                // The view may not be able to handle UI updates anymore</span><br><span class="line">                if (!tasksView.isActive) &#123;</span><br><span class="line">                    return</span><br><span class="line">                &#125;</span><br><span class="line">                tasksView.showLoadingTasksError()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>承担View职责的是一个Fragment</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class TasksFragment : Fragment(), TasksContract.View &#123;</span><br><span class="line">    internal var itemListener: TaskItemListener = object : TaskItemListener &#123;</span><br><span class="line">        override fun onTaskClick(clickedTask: Task) &#123;</span><br><span class="line">            presenter.openTaskDetails(clickedTask)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        override fun onCompleteTaskClick(completedTask: Task) &#123;</span><br><span class="line">            presenter.completeTask(completedTask)</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        override fun onActivateTaskClick(activatedTask: Task) &#123;</span><br><span class="line">            presenter.activateTask(activatedTask)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">     // 省略代码...</span><br><span class="line">    setOnRefreshListener &#123; presenter.loadTasks(false) &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以从上述代码了解到，MVP模式面临的问题是</p>
+<ul>
+<li>View和Presenter之间需要相互持有</li>
+<li>Presenter职责不单一，作为中间人同时要管理view和数据，让代码看起来丑陋。而我们期望Presenter的作用应该是只对数据进行逻辑操作而不需要关系View的状态。</li>
+</ul>
+<h4 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h4><p><img src="https://lh3.googleusercontent.com/-qiP0oo7E56Q/XDB3gFg8kQI/AAAAAAAAX0c/4VnI4hbRNxQZe2Tr9z2u9qv6iCC7xONEgCHMYCw/I/15466771241137.png" alt=""><br><em>图片来之wikipedia MVVM</em></p>
+<p>MVVM是通过数据绑定，让原来的View和Presenter的职责更单一的改进。Model提供数据，ViewModel来做业务逻辑处理和管理状态，View只更具ViewModel的数据自己变化显示。<br>这样的想法很好，如何在Android里实现呢，答案是ViewModel和LiveData</p>
+<h3 id="ViewModel-LiveData实现MVVM"><a href="#ViewModel-LiveData实现MVVM" class="headerlink" title="ViewModel + LiveData实现MVVM"></a>ViewModel + LiveData实现MVVM</h3><p>Android里去年引入的ViewModel类，被设计用来保存和View显示逻辑相关的数据，它是忽略configuration change的一个类，就算因为configuration change数据依然会被保留。<br>LiveData可以简单理解为一个放数据的容器，并且知晓UI的生命周期，它是一个数据的观察者它可以知晓数据的变化，所以叫它LiveData活数据嘛。</p>
+<p>同样是前面MVP展示的逻辑，一个todo list应用需要加todo列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">public class TasksViewModel extends AndroidViewModel &#123;</span><br><span class="line">    // 数据列表</span><br><span class="line">    public final ObservableList&lt;Task&gt; items = new ObservableArrayList&lt;&gt;();</span><br><span class="line">    // loading状态</span><br><span class="line">    public final ObservableBoolean dataLoading = new ObservableBoolean(false);</span><br><span class="line"></span><br><span class="line">     // 省略代码...</span><br><span class="line"></span><br><span class="line">    private void loadTasks(boolean forceUpdate, final boolean showLoadingUI) &#123;</span><br><span class="line">        // 只用设置loading的状态，不再需要持有View</span><br><span class="line">        if (showLoadingUI) &#123;</span><br><span class="line">            dataLoading.set(true);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        mTasksRepository.getTasks(new TasksDataSource.LoadTasksCallback() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void onTasksLoaded(List&lt;Task&gt; tasks) &#123;</span><br><span class="line">                // 单纯的更新数据，而不再用操心View的状态</span><br><span class="line">                List&lt;Task&gt; tasksToShow = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">                if (showLoadingUI) &#123;</span><br><span class="line">                    dataLoading.set(false);</span><br><span class="line">                &#125;</span><br><span class="line">                mIsDataLoadingError.set(false);</span><br><span class="line"></span><br><span class="line">                items.clear();</span><br><span class="line">                items.addAll(tasksToShow);</span><br><span class="line">                empty.set(items.isEmpty());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void onDataNotAvailable() &#123;</span><br><span class="line">                mIsDataLoadingError.set(true);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>View的逻辑，这里用了Android的DataBinding，loading的显示更具ViewModel里的值来判断</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;SwipeRefreshLayout</span><br><span class="line">    android:id=&quot;@+id/refresh_layout&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;</span><br><span class="line">    android:onRefresh=&quot;@&#123;viewmodel&#125;&quot;</span><br><span class="line">    app:refreshing=&quot;@&#123;viewmodel.dataLoading&#125;&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<p>总结，MVVM可以让View的职责更加单一只是根据数据来显示。ViewModel可以单纯的处理数据而不用关心View的状态</p>
+<h3 id="ViewModel的其他好处"><a href="#ViewModel的其他好处" class="headerlink" title="ViewModel的其他好处"></a>ViewModel的其他好处</h3><ul>
+<li><p>Fragment间传递数据<br>Fragment之前直接传递数据是如此的痛苦，小数据放bundle put也就忍了，数据太大还只能通过直接持有Fragment的引用传入数据引用。现在有了ViewModel可以很方便的传递数据，因为在同一个Activity里可以获得到同一个ViewModel，数据可以直接拿来用。<br>这样的好处显而易见，</p>
+<ul>
+<li>Activity不需要了解Fragment直接通信的过程</li>
+<li>Fragment直接也不需要互相了解，只需要从ViewModel里拿数据就好了</li>
+<li>数据会因为是通过引用传递过去的，其中一个Fragment因为生命周期而影响数据</li>
+</ul>
+</li>
+<li><p>测试方便<br>ViewModel不再持有具体的Android类，View啊Activity，Fragment啥的，给测试单独ViewModel提供了可能。</p>
+</li>
+<li>代替onSaveInstanceState保存状态<br>Fragment之前保存数据和恢复状态一直很疼，需要自己onSaveInstanceState，并且因为onSaveInstanceState用的bundle并不能放入大量数据，只能简单的保存一些简单的状态。但是现在有ViewModel它不会随着configuration change而变化，数据就静静的呆在那所以Fragment被回收后从新创建也不用担心数据丢失了。</li>
+</ul>
+<h3 id="ViewModel的秘密"><a href="#ViewModel的秘密" class="headerlink" title="ViewModel的秘密"></a>ViewModel的秘密</h3><p>ViewModel的神奇的一点是它到底如何逃离configuration change导致的生命周期变化的呢？<br>其实非常简单，是利用了Fragment的<br><code>Fragment.setRetainInstance(true)</code>。</p>
+<p>看源码：<br>ViewModelStores是保存ViewModel的地方<br><img src="https://lh3.googleusercontent.com/-TD3oTnqKz_w/XDB3gyhU-kI/AAAAAAAAX0g/QxAMBiU3VBkUDaZRxR8GbBJunB1Ct6HFgCHMYCw/I/15466795141530.jpg" alt=""><br>ViewModel是重HolderFragment里取出。</p>
+<p>HolderFragment<br><img src="https://lh3.googleusercontent.com/-dZ2I1pVEHKk/XDB3hSp65ZI/AAAAAAAAX0k/SkXAcL0skdADW9PLdF6qAnxJz0p6Ni7VwCHMYCw/I/15466795743944.jpg" alt=""></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ul>
+<li><p><a href="https://medium.com/androiddevelopers/viewmodels-persistence-onsaveinstancestate-restoring-ui-state-and-loaders-fc7cc4a6c090" target="_blank" rel="noopener">ViewModels: Persistence, onSaveInstanceState(), Restoring UI State and Loaders</a></p>
+</li>
+<li><p><a href="https://github.com/googlesamples/android-architecture" target="_blank" rel="noopener">Google samples - Android Architecture Blueprints</a></p>
+</li>
+<li><a href="https://medium.com/androiddevelopers/viewmodels-and-livedata-patterns-antipatterns-21efaef74a54" target="_blank" rel="noopener">ViewModels and LiveData: Patterns + AntiPatterns</a></li>
+<li><a href="https://www.youtube.com/watch?v=ugpC98LcNqA&amp;t=989s" target="_blank" rel="noopener">Android MVP vs MVVM and the winner is…</a></li>
+</ul>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+        <div class="nav-previous">
+          <a href="/2019/01/05/Android-ClassLoader-机制/" rel="prev"><span class="meta-arraw meta-arraw-left"></span> 上一页</a>
+        </div>
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/23/celery-简单使用/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2019</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
