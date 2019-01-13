@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="python性能优化之函数执行时间分析">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>python性能优化之函数执行时间分析 - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            python性能优化之函数执行时间分析
+            
+          </h1>
+          <p class="posted-on">
+          2019-01-13
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/性能优化/" rel="tag">
+                  性能优化
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <p>最近发现项目API请求比较慢，通过抓包发现主要是response时间太长，于是就开始进行优化工作。优化工作的关键一步是<strong>定位出问题的瓶颈</strong>，对于优化速度来说，从优化函数执行时间这个维度去切入是一个不错的选择。</p>
+<blockquote>
+<p>本文侧重分析，不展开如何优化</p>
+</blockquote>
+<h2 id="利器"><a href="#利器" class="headerlink" title="利器"></a>利器</h2><p>工欲善其事，必先利其器，我们需要一套方便高效的工具记录函数运行时间。说是一套工具，但对于一个简单项目或者日常开发来说，实现一个工具类足矣，由于实现比较简单，直接上代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> functools <span class="keyword">import</span> wraps</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> cProfile</span><br><span class="line"><span class="keyword">from</span> line_profiler <span class="keyword">import</span> LineProfiler</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func_time</span><span class="params">(f)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    简单记录执行时间</span></span><br><span class="line"><span class="string">    :param f:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(f)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        start = time.time()</span><br><span class="line">        result = f(*args, **kwargs)</span><br><span class="line">        end = time.time()</span><br><span class="line">        <span class="keyword">print</span> f.__name__, <span class="string">'took'</span>, end - start, <span class="string">'seconds'</span></span><br><span class="line">        <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func_cprofile</span><span class="params">(f)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    内建分析器</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @wraps(f)</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">        profile = cProfile.Profile()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            profile.enable()</span><br><span class="line">            result = f(*args, **kwargs)</span><br><span class="line">            profile.disable()</span><br><span class="line">            <span class="keyword">return</span> result</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            profile.print_stats(sort=<span class="string">'time'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">from</span> line_profiler <span class="keyword">import</span> LineProfiler</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">func_line_time</span><span class="params">(follow=[])</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        每行代码执行时间详细报告</span></span><br><span class="line"><span class="string">        :param follow: 内部调用方法</span></span><br><span class="line"><span class="string">        :return:</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">decorate</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="meta">            @wraps(func)</span></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">profiled_func</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    profiler = LineProfiler()</span><br><span class="line">                    profiler.add_function(func)</span><br><span class="line">                    <span class="keyword">for</span> f <span class="keyword">in</span> follow:</span><br><span class="line">                        profiler.add_function(f)</span><br><span class="line">                    profiler.enable_by_count()</span><br><span class="line">                    <span class="keyword">return</span> func(*args, **kwargs)</span><br><span class="line">                <span class="keyword">finally</span>:</span><br><span class="line">                    profiler.print_stats()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> profiled_func</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> decorate</span><br><span class="line"></span><br><span class="line"><span class="keyword">except</span> ImportError:</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">func_line_time</span><span class="params">(follow=[])</span>:</span></span><br><span class="line">        <span class="string">"Helpful if you accidentally leave in production!"</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">decorate</span><span class="params">(func)</span>:</span></span><br><span class="line"><span class="meta">            @wraps(func)</span></span><br><span class="line">            <span class="function"><span class="keyword">def</span> <span class="title">nothing</span><span class="params">(*args, **kwargs)</span>:</span></span><br><span class="line">                <span class="keyword">return</span> func(*args, **kwargs)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> nothing</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> decorate</span><br></pre></td></tr></table></figure>
+<p>原始代码见<a href="https://gist.github.com/adisonhuang/77f94b304c66a2c251dcbc8b5866c5b9" target="_blank" rel="noopener">gist</a></p>
+<p>如下，实现了3个装饰器函数<code>func_time</code>,<code>func_cprofile</code>,<code>func_line_time</code>,分别对应</p>
+<ol>
+<li>简单输出函数的执行时间</li>
+<li>利用python自带的内置分析包<code>cProfile</code> 分析，它主要统计函数调用以及每个函数所占的cpu时间</li>
+<li>利用<a href="https://github.com/rkern/line_profiler" target="_blank" rel="noopener"><code>line_profiler</code></a>开源项目,它可以统计每行代码的执行次数和执行时间。</li>
+</ol>
+<h3 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h3><p>我们以一个简单的循环例子来说明一下,</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10000000</span>):</span><br><span class="line">        <span class="keyword">print</span> x</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>func_time</code></li>
+</ul>
+<p>关于<code>func_time</code>我觉得没什么好说的，就是简单输出下函数调用时间，这个在我们粗略统计函数执行时间的时候可以使用</p>
+<p>如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@func_time</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10000000</span>):</span><br><span class="line">        <span class="keyword">print</span> x</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">test took <span class="number">6.10190296173</span> seconds</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>func_cprofile</code></li>
+</ul>
+<p><code>cProfile</code>是python内置包，基于lsprof的用C语言实现的扩展应用，运行开销比较合理，没有外部依赖，适合做快速的概要测试</p>
+   <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@func_cprofile</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10000000</span>):</span><br><span class="line">        <span class="keyword">print</span> x</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">         <span class="number">3</span> function calls <span class="keyword">in</span> <span class="number">6.249</span> seconds</span><br><span class="line"></span><br><span class="line">   Ordered by: internal time</span><br><span class="line"></span><br><span class="line">   ncalls  tottime  percall  cumtime  percall filename:lineno(function)</span><br><span class="line">        <span class="number">1</span>    <span class="number">6.022</span>    <span class="number">6.022</span>    <span class="number">6.249</span>    <span class="number">6.249</span> test.py:<span class="number">41</span>(test)</span><br><span class="line">        <span class="number">1</span>    <span class="number">0.227</span>    <span class="number">0.227</span>    <span class="number">0.227</span>    <span class="number">0.227</span> &#123;range&#125;</span><br><span class="line">        <span class="number">1</span>    <span class="number">0.000</span>    <span class="number">0.000</span>    <span class="number">0.000</span>    <span class="number">0.000</span> &#123;method <span class="string">'disable'</span> of <span class="string">'_lsprof.Profiler'</span> objects&#125;</span><br></pre></td></tr></table></figure>
+<p>输出说明：</p>
+<blockquote>
+<p>单位为秒</p>
+</blockquote>
+<ol>
+<li><p>第一行告诉我们一共有3个函数被调用。</p>
+<blockquote>
+<p>正常开发过程，第一行更多是输出类似<code>194 function calls (189 primiive calls) in 0.249 seconds</code>，(189 primiive calls)表示189个是原生（primitive）调用，表明这些调用不涉及递归</p>
+</blockquote>
+</li>
+<li><p>ncalls表示函数的调用次数，如果这一列有两个数值，表示有递归调用，第一个是总调用次数，第二个是原生调用次数。</p>
+</li>
+<li><p>tottime是函数内部消耗的总时间（不包括调用其他函数的时间）。</p>
+</li>
+<li><p>percall是tottime除以ncalls，表示每次调用平均消耗时间。</p>
+</li>
+<li><p>cumtime是之前所有子函数消耗时间的累积和。</p>
+</li>
+<li><p>percall是cumtime除以原生调用的数量，表示该函数调用时，每个原生调用的平均消耗时间。</p>
+</li>
+<li><p>filename:lineno(function)为被分析函数所在文件名、行号、函数名。</p>
+</li>
+</ol>
+<ul>
+<li><code>func_line_time</code></li>
+</ul>
+<p><a href="https://github.com/rkern/line_profiler" target="_blank" rel="noopener"><code>line_profiler</code></a>可以生成非常直接和详细的报告，但它系统开销很大，会比实际执行时间慢一个数量级</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@func_line_time()</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10000000</span>):</span><br><span class="line">        <span class="keyword">print</span> x</span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">Timer unit: <span class="number">1e-06</span> s</span><br><span class="line"></span><br><span class="line">Total time: <span class="number">14.4183</span> s</span><br><span class="line">File: /Users/apple/develop/python/app/yuanshu_server/tools/test.py</span><br><span class="line">Function: test at line <span class="number">41</span></span><br><span class="line"></span><br><span class="line">Line <span class="comment">#      Hits         Time  Per Hit   % Time  Line Contents</span></span><br><span class="line">==============================================================</span><br><span class="line">    <span class="number">41</span>                                           @func_line_time()</span><br><span class="line">    <span class="number">42</span>                                           <span class="function"><span class="keyword">def</span> <span class="title">test</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="number">43</span>  <span class="number">10000001</span>    <span class="number">4031936.0</span>      <span class="number">0.4</span>     <span class="number">28.0</span>      <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10000000</span>):</span><br><span class="line">    <span class="number">44</span>  <span class="number">10000000</span>   <span class="number">10386347.0</span>      <span class="number">1.0</span>     <span class="number">72.0</span>          <span class="keyword">print</span> x</span><br></pre></td></tr></table></figure>
+<p>输出说明：</p>
+<blockquote>
+<p>单位为微秒</p>
+</blockquote>
+<ol>
+<li><p>Total Time：测试代码的总运行时间</p>
+</li>
+<li><p>Line:代码行号</p>
+</li>
+<li>Hits：表示每行代码运行的次数</li>
+<li>Time：每行代码运行的总时间</li>
+<li>Per Hits：每行代码运行一次的时间</li>
+<li>% Time：每行代码运行时间的百分比</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>日常开发中，可以使用<code>func_time</code>,<code>func_cprofile</code>做基本检查，定位大致问题，使用<code>func_line_time</code>进行更细致的深入检查。</p>
+<blockquote>
+<p>注：<code>func_line_time</code> 还可以检查函数内部调用的函数执行时间，通过<code>follow</code>参数指定对应的内部调用的函数声明即可，该参数是个数组，也就是说可以检查多个内部调用的函数</p>
+</blockquote>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+      
+        <div class="nav-next">
+          <a href="/2019/01/05/Android-ClassLoader-机制/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2019</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
