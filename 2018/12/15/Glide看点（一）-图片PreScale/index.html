@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--Description-->
+  
+
+  <!--Author-->
+  
+  <meta name="author" content="Foreader Tech">
+  
+
+  <!--Open Graph Title-->
+  
+      <meta property="og:title" content="Glide看点（一） 图片PreScale">
+  
+  <!--Open Graph Description-->
+  
+  <!--Open Graph Site Name-->
+  <meta property="og:site_name" content="Foreader Tech">
+  <!--Type page-->
+  
+      <meta property="og:type" content="article">
+  
+  <!--Page Cover-->
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Title -->
+  
+  <title>Glide看点（一） 图片PreScale - Foreader Tech</title>
+
+
+  <link rel="shortcut icon" href="https://author.foreader.com.cn/static/img/favicon.ico">
+
+  <!-- Custom CSS/Sass -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!----------------------------
+  https://github.com/GallenHu/hexo-theme-Daily
+
+ _____            _   _
+|  __ \          (_) | |
+| |  | |   __ _   _  | |  _   _
+| |  | |  / _` | | | | | | | | |
+| |__| | | (_| | | | | | | |_| |
+|_____/   \__,_| |_| |_|  \__, |
+                          __/ |
+                         |___/
+
+    --------------------------->
+
+</head>
+
+
+<body>
+
+  <!-- Nav -->
+  <header class="site-header">
+  <div class="header-inside">
+    <div class="logo">
+      <a href="/" rel="home">
+        
+        <img src="https://www.foreader.com.cn/static/img/susu1.3329481.png" alt="Foreader Tech" height="60">
+        
+      </a>
+    </div>
+    <!-- Navigation -->
+    <nav class="navbar">
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse">
+        <ul class="navbar-nav">
+          
+          
+            <li>
+              <a href="/.">
+                
+                  主页
+                
+              </a>
+            </li>
+          
+            <li>
+              <a href="/archives">
+                
+                  归档
+                
+              </a>
+            </li>
+          
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </nav>
+    <div class="button-wrap">
+      <button class="menu-toggle">Primary Menu</button>
+    </div>
+  </div>
+</header>
+
+
+  <!-- Main Content -->
+  <div class="content-area">
+  <div class="post">
+    <!-- Post Content -->
+    <div class="container">
+      <article>
+        <!-- Title date & tags -->
+        <div class="post-header">
+          <h1 class="entry-title">
+            Glide看点（一） 图片PreScale
+            
+          </h1>
+          <p class="posted-on">
+          2018-12-15
+          </p>
+          <div class="tags-links">
+            
+              
+                <a href="/tags/Android, Glide/" rel="tag">
+                  Android, Glide
+                </a>
+              
+            
+          </div>
+        </div>
+        <!-- Post Main Content -->
+        <div class="entry-content has_line_number">
+          <h4 id="Glide是如何根据View大小对图片进行缩放优化呢-（pre-scale"><a href="#Glide是如何根据View大小对图片进行缩放优化呢-（pre-scale" class="headerlink" title="Glide是如何根据View大小对图片进行缩放优化呢 （pre scale)"></a>Glide是如何根据View大小对图片进行缩放优化呢 （pre scale)</h4><p>我们都知道图片实际大小和实际显示的区域一般不能是一样的，所以如果图片尺寸本身很大但是展示区域很小的话就会，如果已完整尺寸对图片进行加载就会效率很低浪费内存，加载速度慢。所以一般我们会根据图片实际需要显示的实际大小对图片进行缩放。<br>Android内置了inSampleSize方法来对图片进行缩放, Glide抽象出了一个类叫Downsampler.class来根据期望的图片大小和缩放策略进行向下采样。所以关键点变为了Glide如何知道我们的View实际需要的显示区域。下面将通过一个性能问题的debug故事分析glide源码</p>
+<h4 id="Wrap-Content引发的性能问题“血案”"><a href="#Wrap-Content引发的性能问题“血案”" class="headerlink" title="Wrap Content引发的性能问题“血案”"></a>Wrap Content引发的性能问题“血案”</h4><p>一个类似聊天信息的界面，如果列表里有4，5张图片后，滑动就会变得异常卡顿。<img src="https://lh3.googleusercontent.com/-nIhLIng7BgQ/XAzlDXhtuQI/AAAAAAAAXi4/gLy4BR_ctw06PVZhvl2zvTcWt78_5SsMACHMYCw/I/screen_shoot.jpeg" alt="screen_shoot-w540"></p>
+<h3 id="诊断"><a href="#诊断" class="headerlink" title="诊断"></a>诊断</h3><p>打开Android Monitor抓取性能Trace，发现咦咋性能消耗最大的是Glide decode Bitmap。<br><img src="https://lh3.googleusercontent.com/-w0li48k0DMs/XAzlD3LjLnI/AAAAAAAAXi8/pHdkLKcqx7YezzLYe6XcAtgdKNy5cfgigCHMYCw/I/performance.png" alt="performance"><br>感觉不应该啊，我图片虽然可能很大但是实际显示区域不大，Glide在显示前应该已经会根据ImageView的实际显示效果进行了缩放采样（DownSample）的优化不应该产生卡顿啊。<br><strong>*</strong>等等<strong>***</strong><br>难道缩放采样出现了问题？</p>
+<p>我们根据Glide的调用链找分析。<br><code>GlideApp.with(context).load(imgUrl).into(target)</code><br>RequestBuilder的into方法其实是调用管理图片加载请求的RequestTrack里的track方法最后调用到了具体Request的begin方法。<br>Step1:<br>SingleRequest.run()方法 -&gt; ViewTarget.getSize()<br><img src="https://lh3.googleusercontent.com/-PA1liE7Xv4Q/XAzlEgt23mI/AAAAAAAAXjA/y6i3o5QSFGQcoiLiSWMCj6oy09FZOEEPQCHMYCw/I/15443470777195.jpg" alt=""><br>如果开发者有制定大小OverrideSize就会直接采用该尺寸，如果没有就去ViewTarget里去拿size<br>ViewTarget.getSize -&gt; sizeDeterminer.getSize(cb);<br><img src="https://lh3.googleusercontent.com/-P8wZJt_gZow/XAzlFuAXigI/AAAAAAAAXjE/McvQrudFhAopNkYxflkrFZ2JmZnYjrOQwCHMYCw/I/15443472154597.jpg" alt=""><br>ViewTarget里会根据SizeDeterminer去获取TargetView的具体尺寸。如果能直接从View里读取到具体的尺寸就直接用。<br><img src="https://lh3.googleusercontent.com/-c21fwwJI7xY/XAzlGrjViaI/AAAAAAAAXjI/KjDCqb9dyr0kKMOHjhaaOWQxKkG3m3E0QCHMYCw/I/15443473205402.jpg" alt=""><br>如果读取不到就用PreDrawListener在layout完成后去监听view的实际尺寸：<br>observer.addOnPreDrawListener(layoutListener);<br>关键点来了，去看添加的preDrawListener,里面有个特殊的if语句，如果view定义了WRAP_CONTENT, Glide就无法判断到底使用什么大小去preScale图片，所以它取了屏幕的最大宽度作为图片的加载大小。（不取图片的Target.SIZE_ORIGINAL的原因是可能图片会很大，远远大于屏幕尺寸）<br>SizeDeterminerLayoutListener:<br>`</p>
+<pre><code>  if (!view.isLayoutRequested() &amp;&amp; paramSize == LayoutParams.WRAP_CONTENT) {
+    if (Log.isLoggable(TAG, Log.INFO)) {
+      Log.i(TAG, &quot;Glide treats LayoutParams.WRAP_CONTENT as a request for an image the size of&quot;
+          + &quot; this device&apos;s screen dimensions. If you want to load the original image and are&quot;
+          + &quot; ok with the corresponding memory cost and OOMs (depending on the input size), use&quot;
+          + &quot; .override(Target.SIZE_ORIGINAL). Otherwise, use LayoutParams.MATCH_PARENT, set&quot;
+          + &quot; layout_width and layout_height to fixed dimension, or use .override() with fixed&quot;
+          + &quot; dimensions.&quot;);
+    }
+return getMaxDisplayLength(view.getContext());
+  }
+</code></pre><p>`</p>
+<h3 id="元凶"><a href="#元凶" class="headerlink" title="元凶"></a>元凶</h3><p>看到这里刚才的性能问题迎刃而解，虽然我们界面里的ImageView实际显示区域很小（maxWitdh和maxHeight限制的），但是Glide不知道。一看我们list item的布局果然如此</p>
+<p><img src="https://lh3.googleusercontent.com/-d6Q239URgRs/XAzlH3SplII/AAAAAAAAXjM/fNRZf4EgtRM2jl9XDngeqqhz3ixkH7DvACHMYCw/I/15161493230346.jpg" alt=""><br>所以在列表里的每一张图片都是以手机的最大宽度去加载的，所以decode bitmap才花了巨大的时间。</p>
+<p>所以Fix这个问题只需要，在加载图片前设置好需要的加载宽度就可以解决啦。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>图片加载的一个重要手段是，“按需显示”更具实际需要显示的图片大小进行预缩放（Pre Scale)， PreScale要根据图片的显示大小和图片本身实际大小来计算inSampleSize来进行。Glide在处理Wrap Content的ImageView的时候，会不知道如何进行PreScale需要指定好具体显示的尺寸，不然可能会引发性能问题。</p>
+
+        </div>
+      </article>
+    </div>
+    <!-- Comments -->
+    <div class="container">
+      
+<section id="comment">
+  <!-- <h1 class="title">留言</h1> -->
+
+  
+</section>
+
+
+    </div>
+    <!-- Pre or Next -->
+    <div class="nav-links">
+      
+        <div class="nav-previous">
+          <a href="/2018/12/15/Kotlin-coroutine（一）异步回调的故事/" rel="prev"><span class="meta-arraw meta-arraw-left"></span> 上一页</a>
+        </div>
+      
+      
+        <div class="nav-next">
+          <a href="/2018/12/15/Glide看点（二）巧用Fragment管理生命周期/" rel="prev">下一页 <span class="meta-arraw meta-arraw-right"></span></a>
+        </div>
+      
+    </div>
+
+  </div>
+</div>
+
+
+  <!-- Footer -->
+  <!-- Footer-widgets -->
+<div class="footer-widgets">
+  <div class="row inside-wrapper">
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">关于本站</h1>
+        <div class="custom-widget-content">
+          
+          <p>北京复阅科技有限公司技术小分队分享基地</p>
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">与我联系</h1>
+        <div class="widget-text">
+          
+            
+              <a href="https://github.com/BJForeader" class="icon icon-github" target="_blank">github</a>
+            
+              <a href="mailto:jishu@foreader.cn" class="icon icon-mail" target="_blank">mail</a>
+            
+          
+        </div>
+      </aside>
+    </div>
+    <div class="col-1-3">
+      <aside>
+        <h1 class="widget-title">站内搜索</h1>
+        <div class="widget-text">
+          <form onsubmit="return appDaily.submitSearch('')">
+            <p>
+              <input type="text" placeholder="search..." id="homeSearchInput">
+            </p>
+            <!-- <input type="submit" value="GO"> -->
+          </form>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="site-info">
+  <p>
+    <span>Foreader Tech &copy; 2019</span>
+    
+      <span class="split">|</span>
+      <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> with Theme <a href="https://github.com/GallenHu/hexo-theme-Daily" target="_blank">Daily</a></span>
+    
+  </p>
+</footer>
+
+
+  <!-- After footer scripts -->
+  <!-- scripts -->
+<script src="/js/app.js"></script>
+
+
+
+
+
+</body>
+
+</html>
